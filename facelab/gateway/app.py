@@ -1,0 +1,167 @@
+from fastapi import FastAPI, UploadFile, File, HTTPException, Request
+from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from fastapi.middleware.cors import CORSMiddleware
+import requests
+from pathlib import Path
+
+# Import regions configuration
+from regions import REGIONS, get_region_by_id, get_all_regions
+
+app = FastAPI(title="FaceLab Hub", version="2.0.0")
+
+# ====== CORS Configuration for Frontend ======
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# ====== Config ======
+SIMSWAP_URL = "http://127.0.0.1:8001/run"  # SimSwap service endpoint (single)
+SIMSWAP_MULTI_URL = "http://127.0.0.1:8001/run_multi"  # SimSwap service endpoint (multi)
+
+BASE_DIR = Path(__file__).resolve().parent
+STATIC_DIR = BASE_DIR / "static"
+TEMPLATES_DIR = BASE_DIR / "templates"
+STATIC_DIR.mkdir(exist_ok=True)
+
+# Serve static files (for displaying results)
+app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
+
+
+@app.get("/", response_class=HTMLResponse)
+def home(request: Request):
+    # Hub page (currently only SimSwap enabled)
+    return templates.TemplateResponse("index.html", {"request": request})
+
+
+@app.get("/health")
+def health():
+    return {"status": "ok", "service": "gateway"}
+
+
+# ====== Region API ======
+@app.get("/api/regions")
+def list_regions():
+    """Get all available regions with their configurations"""
+    return {"regions": get_all_regions()}
+
+
+@app.get("/api/regions/{region_id}")
+def get_region(region_id: str):
+    """Get a specific region by ID"""
+    region = get_region_by_id(region_id)
+    if region is None:
+        raise HTTPException(status_code=404, detail=f"Region '{region_id}' not found")
+    return region
+
+
+@app.post("/api/simswap")
+def simswap(src: UploadFile = File(...), dst: UploadFile = File(...)):
+    try:
+        src.file.seek(0)
+    except Exception:
+        pass
+    try:
+        dst.file.seek(0)
+    except Exception:
+        pass
+
+    files = {
+        "src": (src.filename, src.file, src.content_type),
+        "dst": (dst.filename, dst.file, dst.content_type),
+    }
+
+    try:
+        r = requests.post(SIMSWAP_URL, files=files, timeout=600)
+    except requests.RequestException as e:
+        raise HTTPException(status_code=502, detail=f"SimSwap service unreachable: {e}")
+
+    if r.status_code != 200:
+        # ส่ง error กลับให้หน้าเว็บอ่านได้
+        return JSONResponse(status_code=r.status_code, content={"detail": r.text})
+
+    # บันทึกผลลัพธ์เป็นไฟล์ static เพื่อให้ <img src=...> เรียกได้
+    out_path = STATIC_DIR / "simswap_result.png"
+    out_path.write_bytes(r.content)
+
+    return {"ok": True, "result_url": "/static/simswap_result.png"}
+
+
+
+@app.post("/api/simswap_multi_upload")
+async def simswap_multi_upload(src: list[UploadFile] = File(...), dst: UploadFile = File(...)):
+    """Accept explicit file uploads (List[UploadFile]) so Swagger UI shows inputs.
+    This endpoint mirrors the behavior of `/api/simswap_multi` but exposes typed params for the docs.
+    """
+    # save into shared_storage/uploads and forward, similar to simswap_multi logic
+    shared_upload_dir = BASE_DIR.parent / 'shared_storage' / 'uploads'
+    shared_upload_dir.mkdir(parents=True, exist_ok=True)
+
+    job = __import__('uuid').uuid4().hex[:10]
+    saved_files = []
+    # save src files
+    for i, f in enumerate(src):
+        try:
+            await f.seek(0)
+        except Exception:
+            pass
+        suffix = Path(getattr(f, 'filename', f'src{i}')).suffix or '.jpg'
+        outp = shared_upload_dir / f"{job}_src{i}{suffix}"
+        data = await f.read()
+        outp.write_bytes(data)
+        saved_files.append(('src', outp))
+
+    # save dst
+    try:
+        await dst.seek(0)
+    except Exception:
+        pass
+    suffix = Path(getattr(dst, 'filename', 'dst')).suffix or '.jpg'
+    outp = shared_upload_dir / f"{job}_dst{suffix}"
+    data = await dst.read()
+    outp.write_bytes(data)
+    saved_files.append(('dst', outp))
+
+    # open saved files for forwarding
+    opened_handles = []
+    files = []
+    for kind, p in saved_files:
+        fh = open(p, 'rb')
+        opened_handles.append(fh)
+        files.append((kind, (p.name, fh, 'application/octet-stream')))
+
+    try:
+        r = requests.post(SIMSWAP_MULTI_URL, files=files, timeout=600)
+    except requests.RequestException as e:
+        for fh in opened_handles:
+            try:
+                fh.close()
+            except Exception:
+                pass
+        raise HTTPException(status_code=502, detail=f"SimSwap service unreachable: {e}")
+
+    # close handles
+    for fh in opened_handles:
+        try:
+            fh.close()
+        except Exception:
+            pass
+
+    if r.status_code != 200:
+        return JSONResponse(status_code=r.status_code, content={"detail": r.text})
+
+    out_path = STATIC_DIR / "simswap_result_multi.png"
+    out_path.write_bytes(r.content)
+
+    return {"ok": True, "result_url": "/static/simswap_result_multi.png"}
