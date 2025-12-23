@@ -4,6 +4,8 @@ import RegionSelector from '../components/RegionSelector';
 import GenerationProgress from '../components/GenerationProgress';
 import ResultDisplay from '../components/ResultDisplay';
 import ColorEditor from '../components/ColorEditor';
+import AuthModal from '../components/AuthModal';
+import { useAuth } from '../context/AuthContext';
 import { runSimSwap } from '../services/api';
 import './Home.css';
 
@@ -17,6 +19,11 @@ const STATES = {
 };
 
 function Home() {
+    // Auth
+    const { user, isAuthenticated, signOut } = useAuth();
+    const [showAuthModal, setShowAuthModal] = useState(false);
+    const [authModalMode, setAuthModalMode] = useState('login');
+
     // App state
     const [currentState, setCurrentState] = useState(STATES.UPLOAD);
 
@@ -33,6 +40,25 @@ function Home() {
     const [status, setStatus] = useState('');
     const [resultUrl, setResultUrl] = useState(null);
     const [error, setError] = useState(null);
+
+    // Auth handlers
+    const openLoginModal = () => {
+        setAuthModalMode('login');
+        setShowAuthModal(true);
+    };
+
+    const openSignupModal = () => {
+        setAuthModalMode('signup');
+        setShowAuthModal(true);
+    };
+
+    const handleSignOut = async () => {
+        try {
+            await signOut();
+        } catch (err) {
+            console.error('Sign out failed:', err);
+        }
+    };
 
     // Handlers
     const handleSourceChange = useCallback((file) => {
@@ -137,12 +163,58 @@ function Home() {
             <header className="header">
                 <div className="container">
                     <div className="header-content">
+                        {/* Logo */}
                         <div className="logo">
                             <span className="logo-icon">🎭</span>
                             <span className="logo-text">FaceLab</span>
                         </div>
-                        <div className="header-tagline">
-                            AI Face Swap for Advertising
+
+                        {/* Navigation Menu */}
+                        <nav className="nav-menu">
+                            <button
+                                className={`nav-item ${currentState === STATES.UPLOAD ? 'active' : ''}`}
+                                onClick={handleReset}
+                            >
+                                🏠 HOME
+                            </button>
+                            <button
+                                className="nav-item active"
+                            >
+                                🎭 Face Swap
+                            </button>
+                        </nav>
+
+                        {/* Auth Buttons */}
+                        <div className="auth-buttons">
+                            {isAuthenticated ? (
+                                <>
+                                    <div className="user-info">
+                                        <span className="user-avatar">👤</span>
+                                        <span className="user-email">{user?.email?.split('@')[0]}</span>
+                                    </div>
+                                    <button
+                                        className="btn btn-ghost auth-btn"
+                                        onClick={handleSignOut}
+                                    >
+                                        Sign out
+                                    </button>
+                                </>
+                            ) : (
+                                <>
+                                    <button
+                                        className="btn btn-ghost auth-btn"
+                                        onClick={openSignupModal}
+                                    >
+                                        Sign up
+                                    </button>
+                                    <button
+                                        className="btn btn-primary auth-btn"
+                                        onClick={openLoginModal}
+                                    >
+                                        Log in
+                                    </button>
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -284,6 +356,13 @@ function Home() {
                     <p>© 2024 FaceLab - AI Image Generation for Advertising</p>
                 </div>
             </footer>
+
+            {/* Auth Modal */}
+            <AuthModal
+                isOpen={showAuthModal}
+                onClose={() => setShowAuthModal(false)}
+                initialMode={authModalMode}
+            />
         </div>
     );
 }

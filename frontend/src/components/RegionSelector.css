@@ -9,9 +9,8 @@
     margin-bottom: var(--spacing-xl);
 }
 
-/* Loading & Error States */
-.loading-state,
-.error-state {
+/* Loading State */
+.loading-state {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -30,14 +29,10 @@
     animation: spin 1s linear infinite;
 }
 
-.error-icon {
-    font-size: 32px;
-}
-
 /* Region Grid */
 .region-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: var(--spacing-md);
 }
 
@@ -47,24 +42,13 @@
     flex-direction: column;
     align-items: center;
     gap: var(--spacing-sm);
-    padding: var(--spacing-lg);
+    padding: var(--spacing-lg) var(--spacing-md);
     background: var(--bg-tertiary);
     border: 2px solid var(--border-secondary);
     border-radius: var(--radius-lg);
     cursor: pointer;
     transition: all var(--transition-normal);
     overflow: hidden;
-}
-
-.region-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: transparent;
-    transition: background var(--transition-fast);
 }
 
 .region-card:hover {
@@ -80,40 +64,42 @@
     box-shadow: var(--shadow-glow);
 }
 
-.region-card.selected::before {
-    background: var(--gradient-primary);
+/* Country Code Badge */
+.region-code {
+    position: absolute;
+    top: var(--spacing-sm);
+    left: var(--spacing-sm);
+    padding: 4px 10px;
+    background: var(--bg-quaternary);
+    border: 1px solid var(--border-secondary);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-sm);
+    font-weight: 700;
+    color: var(--text-secondary);
+    letter-spacing: 1px;
 }
 
-/* Tone indicators */
-.region-card.tone-warm::before {
-    background: linear-gradient(90deg, #ff6b6b, #ffa726);
+.region-card.selected .region-code {
+    background: var(--accent-primary);
+    border-color: var(--accent-primary);
+    color: white;
 }
 
-.region-card.tone-cool::before {
-    background: linear-gradient(90deg, #4dd0e1, #6aa1ff);
-}
-
-.region-card.tone-neutral::before {
-    background: linear-gradient(90deg, #90a4ae, #b0bec5);
-}
-
-.region-card.selected.tone-warm::before,
-.region-card.selected.tone-cool::before,
-.region-card.selected.tone-neutral::before {
-    height: 4px;
-}
-
+/* Flag Emoji */
 .region-flag {
-    font-size: 48px;
+    font-size: 56px;
     line-height: 1;
+    margin-top: var(--spacing-md);
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
 
+/* Country Info */
 .region-info {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 2px;
+    text-align: center;
 }
 
 .region-name {
@@ -127,18 +113,7 @@
     color: var(--text-tertiary);
 }
 
-.region-tone {
-    margin-top: var(--spacing-xs);
-}
-
-.tone-label {
-    font-size: var(--font-xs);
-    color: var(--text-secondary);
-    padding: var(--spacing-xs) var(--spacing-sm);
-    background: var(--bg-quaternary);
-    border-radius: var(--radius-full);
-}
-
+/* Selected Indicator */
 .selected-indicator {
     position: absolute;
     top: var(--spacing-sm);
@@ -148,8 +123,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--accent-primary);
-    color: white;
+    background: var(--success);
+    color: var(--bg-primary);
     border-radius: var(--radius-full);
     font-size: var(--font-sm);
     font-weight: 700;
@@ -178,4 +153,23 @@
     font-size: var(--font-md);
     font-weight: 600;
     color: var(--accent-primary);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .region-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .region-flag {
+        font-size: 40px;
+    }
+
+    .region-name {
+        font-size: var(--font-sm);
+    }
+
+    .region-local {
+        font-size: var(--font-xs);
+    }
 }

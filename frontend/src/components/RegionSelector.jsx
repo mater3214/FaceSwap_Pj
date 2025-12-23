@@ -4,12 +4,12 @@ import './RegionSelector.css';
 
 // Fallback data when API is not available
 const FALLBACK_REGIONS = [
-    { id: 'th', name: 'Thailand', nameLocal: 'ประเทศไทย', flag: '🇹🇭', colorTone: 'warm', colorSettings: { brightness: 1.05, contrast: 1.1, saturation: 1.15, temperature: 10 } },
-    { id: 'jp', name: 'Japan', nameLocal: '日本', flag: '🇯🇵', colorTone: 'cool', colorSettings: { brightness: 1.0, contrast: 1.05, saturation: 0.95, temperature: -5 } },
-    { id: 'us', name: 'United States', nameLocal: 'United States', flag: '🇺🇸', colorTone: 'neutral', colorSettings: { brightness: 1.05, contrast: 1.1, saturation: 1.05, temperature: 0 } },
-    { id: 'gb', name: 'United Kingdom', nameLocal: 'United Kingdom', flag: '🇬🇧', colorTone: 'cool', colorSettings: { brightness: 0.98, contrast: 1.0, saturation: 0.9, temperature: -10 } },
-    { id: 'cn', name: 'China', nameLocal: '中国', flag: '🇨🇳', colorTone: 'warm', colorSettings: { brightness: 1.05, contrast: 1.15, saturation: 1.2, temperature: 15 } },
-    { id: 'kr', name: 'South Korea', nameLocal: '대한민국', flag: '🇰🇷', colorTone: 'neutral', colorSettings: { brightness: 1.08, contrast: 1.05, saturation: 1.0, temperature: 0 } },
+    { id: 'th', code: 'TH', name: 'Thailand', nameLocal: 'ประเทศไทย', flag: '🇹🇭', colorSettings: { brightness: 1.05, contrast: 1.1, saturation: 1.15, temperature: 10 } },
+    { id: 'jp', code: 'JP', name: 'Japan', nameLocal: '日本', flag: '🇯🇵', colorSettings: { brightness: 1.0, contrast: 1.05, saturation: 0.95, temperature: -5 } },
+    { id: 'us', code: 'US', name: 'United States', nameLocal: 'United States', flag: '🇺🇸', colorSettings: { brightness: 1.05, contrast: 1.1, saturation: 1.05, temperature: 0 } },
+    { id: 'gb', code: 'GB', name: 'United Kingdom', nameLocal: 'United Kingdom', flag: '🇬🇧', colorSettings: { brightness: 0.98, contrast: 1.0, saturation: 0.9, temperature: -10 } },
+    { id: 'cn', code: 'CN', name: 'China', nameLocal: '中国', flag: '🇨🇳', colorSettings: { brightness: 1.05, contrast: 1.15, saturation: 1.2, temperature: 15 } },
+    { id: 'kr', code: 'KR', name: 'South Korea', nameLocal: '대한민국', flag: '🇰🇷', colorSettings: { brightness: 1.08, contrast: 1.05, saturation: 1.0, temperature: 0 } },
 ];
 
 function RegionSelector({ selectedRegion, onRegionChange }) {
@@ -27,18 +27,9 @@ function RegionSelector({ selectedRegion, onRegionChange }) {
             setRegions(data);
         } catch (err) {
             console.warn('Backend not available, using fallback regions:', err.message);
-            // Use fallback data silently - no error shown to user
             setRegions(FALLBACK_REGIONS);
         } finally {
             setLoading(false);
-        }
-    };
-
-    const getColorToneClass = (tone) => {
-        switch (tone) {
-            case 'warm': return 'tone-warm';
-            case 'cool': return 'tone-cool';
-            default: return 'tone-neutral';
         }
     };
 
@@ -64,20 +55,22 @@ function RegionSelector({ selectedRegion, onRegionChange }) {
                     {regions.map((region) => (
                         <button
                             key={region.id}
-                            className={`region-card ${selectedRegion?.id === region.id ? 'selected' : ''} ${getColorToneClass(region.colorTone)}`}
+                            className={`region-card ${selectedRegion?.id === region.id ? 'selected' : ''}`}
                             onClick={() => onRegionChange(region)}
                         >
+                            {/* Country Code Badge */}
+                            <div className="region-code">{region.code || region.id.toUpperCase()}</div>
+
+                            {/* Flag Emoji */}
                             <span className="region-flag">{region.flag}</span>
+
+                            {/* Country Names */}
                             <div className="region-info">
                                 <span className="region-name">{region.name}</span>
                                 <span className="region-local">{region.nameLocal}</span>
                             </div>
-                            <div className="region-tone">
-                                <span className="tone-label">
-                                    {region.colorTone === 'warm' ? '☀️ Warm' :
-                                        region.colorTone === 'cool' ? '❄️ Cool' : '⚖️ Neutral'}
-                                </span>
-                            </div>
+
+                            {/* Selected Indicator */}
                             {selectedRegion?.id === region.id && (
                                 <div className="selected-indicator">✓</div>
                             )}
@@ -90,7 +83,7 @@ function RegionSelector({ selectedRegion, onRegionChange }) {
                 <div className="selected-preview">
                     <span className="preview-label">ภูมิภาคที่เลือก:</span>
                     <span className="preview-value">
-                        {selectedRegion.flag} {selectedRegion.name}
+                        {selectedRegion.flag} {selectedRegion.name} ({selectedRegion.code || selectedRegion.id.toUpperCase()})
                     </span>
                 </div>
             )}
