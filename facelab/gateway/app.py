@@ -1,25 +1,20 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from fastapi.middleware.cors import CORSMiddleware
 import requests
 from pathlib import Path
 
-# Import regions configuration
-from regions import REGIONS, get_region_by_id, get_all_regions
+# Import region configuration
+from regions import get_all_regions, get_region_by_id
 
-app = FastAPI(title="FaceLab Hub", version="2.0.0")
+app = FastAPI(title="FaceLab Hub")
 
-# ====== CORS Configuration for Frontend ======
+# CORS Middleware for frontend communication
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-    ],
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:5174", "http://127.0.0.1:5174", "http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -45,6 +40,8 @@ def home(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 
+
+
 @app.get("/health")
 def health():
     return {"status": "ok", "service": "gateway"}
@@ -53,7 +50,7 @@ def health():
 # ====== Region API ======
 @app.get("/api/regions")
 def list_regions():
-    """Get all available regions with their configurations"""
+    """Get all available regions"""
     return {"regions": get_all_regions()}
 
 
@@ -61,7 +58,7 @@ def list_regions():
 def get_region(region_id: str):
     """Get a specific region by ID"""
     region = get_region_by_id(region_id)
-    if region is None:
+    if not region:
         raise HTTPException(status_code=404, detail=f"Region '{region_id}' not found")
     return region
 

@@ -3,11 +3,15 @@ import { getResultImageUrl } from '../services/api';
 
 function ResultDisplay({
     sourceFile,
+    sourceFiles = [],
     targetFile,
     resultUrl,
     onReset,
-    onProceedToEdit
+    onProceedToEdit,
+    isMultiMode = false
 }) {
+    // Handle single or multi source files
+    const hasMultipleSources = isMultiMode && sourceFiles.length > 0;
     const sourcePreview = sourceFile ? URL.createObjectURL(sourceFile) : null;
     const targetPreview = targetFile ? URL.createObjectURL(targetFile) : null;
 
@@ -49,11 +53,29 @@ function ResultDisplay({
                 {/* Source */}
                 <div className="comparison-item">
                     <div className="item-label">
-                        <span className="label-icon">👤</span>
-                        รูปอ้างอิง (Source)
+                        <span className="label-icon">{hasMultipleSources ? '👥' : '👤'}</span>
+                        {hasMultipleSources ? 'รูปอ้างอิง (Sources)' : 'รูปอ้างอิง (Source)'}
                     </div>
-                    <div className="item-image">
-                        {sourcePreview && <img src={sourcePreview} alt="Source" />}
+                    <div className={`item-image ${hasMultipleSources ? 'multi-source' : ''}`}>
+                        {hasMultipleSources ? (
+                            <div className="multi-source-grid">
+                                {sourceFiles.slice(0, 4).map((file, index) => (
+                                    <img
+                                        key={index}
+                                        src={URL.createObjectURL(file)}
+                                        alt={`Source ${index + 1}`}
+                                        className="multi-source-img"
+                                    />
+                                ))}
+                                {sourceFiles.length > 4 && (
+                                    <div className="more-indicator">
+                                        +{sourceFiles.length - 4}
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            sourcePreview && <img src={sourcePreview} alt="Source" />
+                        )}
                     </div>
                 </div>
 

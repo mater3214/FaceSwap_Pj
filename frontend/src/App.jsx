@@ -1,13 +1,10 @@
-import { AuthProvider } from './context/AuthContext'
 import Home from './pages/Home'
 import './App.css'
 
 function App() {
-  return (
-    <AuthProvider>
-      <Home />
-    </AuthProvider>
-  )
+    return (
+        <Home />
+    )
 }
 
 export default App

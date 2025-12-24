@@ -2,15 +2,16 @@ import { useState, useEffect } from 'react';
 import { getRegions } from '../services/api';
 import './RegionSelector.css';
 
-// Fallback data when API is not available
+// Fallback data when API is not available (synced with backend regions.py)
 const FALLBACK_REGIONS = [
-    { id: 'th', code: 'TH', name: 'Thailand', nameLocal: 'ประเทศไทย', flag: '🇹🇭', colorSettings: { brightness: 1.05, contrast: 1.1, saturation: 1.15, temperature: 10 } },
-    { id: 'jp', code: 'JP', name: 'Japan', nameLocal: '日本', flag: '🇯🇵', colorSettings: { brightness: 1.0, contrast: 1.05, saturation: 0.95, temperature: -5 } },
-    { id: 'us', code: 'US', name: 'United States', nameLocal: 'United States', flag: '🇺🇸', colorSettings: { brightness: 1.05, contrast: 1.1, saturation: 1.05, temperature: 0 } },
-    { id: 'gb', code: 'GB', name: 'United Kingdom', nameLocal: 'United Kingdom', flag: '🇬🇧', colorSettings: { brightness: 0.98, contrast: 1.0, saturation: 0.9, temperature: -10 } },
-    { id: 'cn', code: 'CN', name: 'China', nameLocal: '中国', flag: '🇨🇳', colorSettings: { brightness: 1.05, contrast: 1.15, saturation: 1.2, temperature: 15 } },
-    { id: 'kr', code: 'KR', name: 'South Korea', nameLocal: '대한민국', flag: '🇰🇷', colorSettings: { brightness: 1.08, contrast: 1.05, saturation: 1.0, temperature: 0 } },
+    { id: 'th', code: 'TH', name: 'Thailand', nameLocal: 'ประเทศไทย', flag: '🇹🇭', flagUrl: 'https://flagcdn.com/w80/th.png', climate: 'tropical', colorTone: 'warm', colorSettings: { brightness: 1.05, contrast: 1.1, saturation: 1.15, temperature: 10 }, style: 'vibrant' },
+    { id: 'jp', code: 'JP', name: 'Japan', nameLocal: '日本', flag: '🇯🇵', flagUrl: 'https://flagcdn.com/w80/jp.png', climate: 'temperate', colorTone: 'cool', colorSettings: { brightness: 1.0, contrast: 1.05, saturation: 0.95, temperature: -5 }, style: 'minimal' },
+    { id: 'us', code: 'US', name: 'United States', nameLocal: 'United States', flag: '🇺🇸', flagUrl: 'https://flagcdn.com/w80/us.png', climate: 'varied', colorTone: 'neutral', colorSettings: { brightness: 1.05, contrast: 1.1, saturation: 1.05, temperature: 0 }, style: 'bold' },
+    { id: 'gb', code: 'GB', name: 'United Kingdom', nameLocal: 'United Kingdom', flag: '🇬🇧', flagUrl: 'https://flagcdn.com/w80/gb.png', climate: 'cool', colorTone: 'cool', colorSettings: { brightness: 0.98, contrast: 1.0, saturation: 0.9, temperature: -10 }, style: 'classic' },
+    { id: 'cn', code: 'CN', name: 'China', nameLocal: '中国', flag: '🇨🇳', flagUrl: 'https://flagcdn.com/w80/cn.png', climate: 'varied', colorTone: 'warm', colorSettings: { brightness: 1.05, contrast: 1.15, saturation: 1.2, temperature: 15 }, style: 'vibrant' },
+    { id: 'kr', code: 'KR', name: 'South Korea', nameLocal: '대한민국', flag: '🇰🇷', flagUrl: 'https://flagcdn.com/w80/kr.png', climate: 'temperate', colorTone: 'neutral', colorSettings: { brightness: 1.08, contrast: 1.05, saturation: 1.0, temperature: 0 }, style: 'clean' },
 ];
+
 
 function RegionSelector({ selectedRegion, onRegionChange }) {
     const [regions, setRegions] = useState([]);

@@ -1,12 +1,11 @@
 import { useState, useCallback } from 'react';
+import ToolsPanel from '../components/ToolsPanel';
 import ImageUploader from '../components/ImageUploader';
 import RegionSelector from '../components/RegionSelector';
 import GenerationProgress from '../components/GenerationProgress';
 import ResultDisplay from '../components/ResultDisplay';
 import ColorEditor from '../components/ColorEditor';
-import AuthModal from '../components/AuthModal';
-import { useAuth } from '../context/AuthContext';
-import { runSimSwap } from '../services/api';
+import { runSimSwap, runSimSwapMulti, getResultImageUrl } from '../services/api';
 import './Home.css';
 
 // App States
@@ -19,16 +18,15 @@ const STATES = {
 };
 
 function Home() {
-    // Auth
-    const { user, isAuthenticated, signOut } = useAuth();
-    const [showAuthModal, setShowAuthModal] = useState(false);
-    const [authModalMode, setAuthModalMode] = useState('login');
+    // Tool selection
+    const [selectedTool, setSelectedTool] = useState('simswap-single');
 
     // App state
     const [currentState, setCurrentState] = useState(STATES.UPLOAD);
 
-    // Image files
+    // Image files (single source or multiple for multi-swap)
     const [sourceFile, setSourceFile] = useState(null);
+    const [sourceFiles, setSourceFiles] = useState([]); // For multi-face swap
     const [targetFile, setTargetFile] = useState(null);
 
     // Region
@@ -41,28 +39,23 @@ function Home() {
     const [resultUrl, setResultUrl] = useState(null);
     const [error, setError] = useState(null);
 
-    // Auth handlers
-    const openLoginModal = () => {
-        setAuthModalMode('login');
-        setShowAuthModal(true);
-    };
-
-    const openSignupModal = () => {
-        setAuthModalMode('signup');
-        setShowAuthModal(true);
-    };
-
-    const handleSignOut = async () => {
-        try {
-            await signOut();
-        } catch (err) {
-            console.error('Sign out failed:', err);
-        }
-    };
-
     // Handlers
+    const handleToolChange = (toolId) => {
+        setSelectedTool(toolId);
+        // Reset files when switching tools
+        setSourceFile(null);
+        setSourceFiles([]);
+        setTargetFile(null);
+        setCurrentState(STATES.UPLOAD);
+    };
+
     const handleSourceChange = useCallback((file) => {
         setSourceFile(file);
+        setError(null);
+    }, []);
+
+    const handleSourceFilesChange = useCallback((files) => {
+        setSourceFiles(files);
         setError(null);
     }, []);
 
@@ -75,8 +68,11 @@ function Home() {
         setSelectedRegion(region);
     }, []);
 
-    const canProceedToRegion = sourceFile && targetFile;
-    const canGenerate = sourceFile && targetFile && selectedRegion;
+    const isMultiMode = selectedTool === 'simswap-multi';
+    const canProceedToRegion = isMultiMode
+        ? (sourceFiles.length > 0 && targetFile)
+        : (sourceFile && targetFile);
+    const canGenerate = canProceedToRegion && selectedRegion;
 
     const handleProceedToRegion = () => {
         if (canProceedToRegion) {
@@ -94,7 +90,6 @@ function Home() {
             setStatus('กำลังเตรียมข้อมูล...');
             setError(null);
 
-            // Simulate progress
             setProgress(10);
             setStatus('กำลังอัพโหลดรูปภาพ...');
 
@@ -105,16 +100,19 @@ function Home() {
             let resultImageUrl = null;
 
             try {
-                // Try to call real API
-                const result = await runSimSwap(sourceFile, targetFile, selectedRegion?.id);
-                resultImageUrl = result.result_url;
+                let result;
+                if (isMultiMode) {
+                    // Multi face swap
+                    result = await runSimSwapMulti(sourceFiles, targetFile);
+                } else {
+                    // Single face swap
+                    result = await runSimSwap(sourceFile, targetFile, selectedRegion?.id);
+                }
+                resultImageUrl = getResultImageUrl(result.result_url);
             } catch (apiError) {
-                // Backend not available - use mock mode
                 console.warn('Backend not available, using mock mode:', apiError.message);
                 setStatus('โหมดทดสอบ (Backend ไม่พร้อม)...');
                 await new Promise(r => setTimeout(r, 800));
-
-                // Use target file as mock result (in real scenario, this would be AI-generated)
                 resultImageUrl = URL.createObjectURL(targetFile);
             }
 
@@ -137,6 +135,7 @@ function Home() {
 
     const handleReset = () => {
         setSourceFile(null);
+        setSourceFiles([]);
         setTargetFile(null);
         setSelectedRegion(null);
         setResultUrl(null);
@@ -163,101 +162,71 @@ function Home() {
             <header className="header">
                 <div className="container">
                     <div className="header-content">
-                        {/* Logo */}
                         <div className="logo">
                             <span className="logo-icon">🎭</span>
                             <span className="logo-text">FaceLab</span>
                         </div>
-
-                        {/* Navigation Menu */}
-                        <nav className="nav-menu">
-                            <button
-                                className={`nav-item ${currentState === STATES.UPLOAD ? 'active' : ''}`}
-                                onClick={handleReset}
-                            >
-                                🏠 HOME
-                            </button>
-                            <button
-                                className="nav-item active"
-                            >
-                                🎭 Face Swap
-                            </button>
-                        </nav>
-
-                        {/* Auth Buttons */}
-                        <div className="auth-buttons">
-                            {isAuthenticated ? (
-                                <>
-                                    <div className="user-info">
-                                        <span className="user-avatar">👤</span>
-                                        <span className="user-email">{user?.email?.split('@')[0]}</span>
-                                    </div>
-                                    <button
-                                        className="btn btn-ghost auth-btn"
-                                        onClick={handleSignOut}
-                                    >
-                                        Sign out
-                                    </button>
-                                </>
-                            ) : (
-                                <>
-                                    <button
-                                        className="btn btn-ghost auth-btn"
-                                        onClick={openSignupModal}
-                                    >
-                                        Sign up
-                                    </button>
-                                    <button
-                                        className="btn btn-primary auth-btn"
-                                        onClick={openLoginModal}
-                                    >
-                                        Log in
-                                    </button>
-                                </>
-                            )}
+                        <div className="header-tagline">
+                            AI for face editing • modular services
                         </div>
                     </div>
                 </div>
             </header>
 
-            {/* Progress Steps */}
-            <div className="progress-steps">
-                <div className="container">
-                    <div className="steps">
-                        <StepIndicator
-                            number={1}
-                            label="อัพโหลด"
-                            active={currentState === STATES.UPLOAD}
-                            completed={currentState !== STATES.UPLOAD}
-                        />
-                        <div className="step-line"></div>
-                        <StepIndicator
-                            number={2}
-                            label="เลือกภูมิภาค"
-                            active={currentState === STATES.REGION}
-                            completed={[STATES.GENERATING, STATES.RESULT, STATES.EDITING].includes(currentState)}
-                        />
-                        <div className="step-line"></div>
-                        <StepIndicator
-                            number={3}
-                            label="สร้างภาพ"
-                            active={currentState === STATES.GENERATING}
-                            completed={[STATES.RESULT, STATES.EDITING].includes(currentState)}
-                        />
-                        <div className="step-line"></div>
-                        <StepIndicator
-                            number={4}
-                            label="ปรับแต่ง"
-                            active={currentState === STATES.EDITING}
-                            completed={false}
-                        />
-                    </div>
-                </div>
-            </div>
+            {/* Main Layout with Tools Panel */}
+            <div className="main-layout">
+                {/* Tools Panel - Left Sidebar */}
+                <aside className="sidebar">
+                    <ToolsPanel
+                        selectedTool={selectedTool}
+                        onToolChange={handleToolChange}
+                    />
+                </aside>
 
-            {/* Main Content */}
-            <main className="main">
-                <div className="container">
+                {/* Main Content */}
+                <main className="main-content">
+                    {/* Tool Title */}
+                    <div className="tool-header">
+                        <h2>
+                            {selectedTool === 'simswap-single' && 'SimSwap (Single Face)'}
+                            {selectedTool === 'simswap-multi' && 'SimSwap (Multi Face)'}
+                            {selectedTool === 'difareli' && 'DiFaReLi (Relighting)'}
+                        </h2>
+                    </div>
+
+                    {/* Progress Steps */}
+                    <div className="progress-steps">
+                        <div className="steps">
+                            <StepIndicator
+                                number={1}
+                                label="อัพโหลด"
+                                active={currentState === STATES.UPLOAD}
+                                completed={currentState !== STATES.UPLOAD}
+                            />
+                            <div className="step-line"></div>
+                            <StepIndicator
+                                number={2}
+                                label="เลือกภูมิภาค"
+                                active={currentState === STATES.REGION}
+                                completed={[STATES.GENERATING, STATES.RESULT, STATES.EDITING].includes(currentState)}
+                            />
+                            <div className="step-line"></div>
+                            <StepIndicator
+                                number={3}
+                                label="สร้างภาพ"
+                                active={currentState === STATES.GENERATING}
+                                completed={[STATES.RESULT, STATES.EDITING].includes(currentState)}
+                            />
+                            <div className="step-line"></div>
+                            <StepIndicator
+                                number={4}
+                                label="ปรับแต่ง"
+                                active={currentState === STATES.EDITING}
+                                completed={false}
+                            />
+                        </div>
+                    </div>
+
                     {/* Error Display */}
                     {error && (
                         <div className="error-banner">
@@ -272,9 +241,12 @@ function Home() {
                         <div className="content-section">
                             <ImageUploader
                                 sourceFile={sourceFile}
+                                sourceFiles={sourceFiles}
                                 targetFile={targetFile}
                                 onSourceChange={handleSourceChange}
+                                onSourceFilesChange={handleSourceFilesChange}
                                 onTargetChange={handleTargetChange}
+                                isMultiMode={isMultiMode}
                             />
 
                             <div className="section-actions">
@@ -329,10 +301,12 @@ function Home() {
                         <div className="content-section">
                             <ResultDisplay
                                 sourceFile={sourceFile}
+                                sourceFiles={sourceFiles}
                                 targetFile={targetFile}
                                 resultUrl={resultUrl}
                                 onReset={handleReset}
                                 onProceedToEdit={handleProceedToEdit}
+                                isMultiMode={isMultiMode}
                             />
                         </div>
                     )}
@@ -347,8 +321,8 @@ function Home() {
                             />
                         </div>
                     )}
-                </div>
-            </main>
+                </main>
+            </div>
 
             {/* Footer */}
             <footer className="footer">
@@ -356,13 +330,6 @@ function Home() {
                     <p>© 2024 FaceLab - AI Image Generation for Advertising</p>
                 </div>
             </footer>
-
-            {/* Auth Modal */}
-            <AuthModal
-                isOpen={showAuthModal}
-                onClose={() => setShowAuthModal(false)}
-                initialMode={authModalMode}
-            />
         </div>
     );
 }

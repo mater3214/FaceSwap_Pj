@@ -1,0 +1,96 @@
+.tools-panel {
+    background: linear-gradient(145deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    border-radius: 12px;
+    padding: 1.25rem;
+    min-width: 200px;
+    max-width: 250px;
+}
+
+.tools-title {
+    color: #e2e8f0;
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 1rem 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.tools-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.tool-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: rgba(30, 41, 59, 0.6);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+    width: 100%;
+}
+
+.tool-item:hover:not(.disabled) {
+    background: rgba(99, 102, 241, 0.15);
+    border-color: rgba(99, 102, 241, 0.4);
+}
+
+.tool-item.selected {
+    background: rgba(99, 102, 241, 0.2);
+    border-color: #6366f1;
+}
+
+.tool-item.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.tool-checkbox {
+    color: #22c55e;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.tool-item.disabled .tool-checkbox {
+    color: #f59e0b;
+}
+
+.tool-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+}
+
+.tool-name {
+    color: #22d3ee;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.tool-item.selected .tool-name {
+    color: #a5f3fc;
+}
+
+.tool-status {
+    color: #94a3b8;
+    font-size: 0.75rem;
+    font-style: italic;
+}
+
+.tools-notes {
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.tools-notes p {
+    color: #64748b;
+    font-size: 0.7rem;
+    margin: 0.25rem 0;
+}
