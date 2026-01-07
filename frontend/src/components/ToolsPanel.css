@@ -1,19 +1,18 @@
 .tools-panel {
-    background: linear-gradient(145deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
-    border: 1px solid rgba(99, 102, 241, 0.3);
-    border-radius: 12px;
-    padding: 1.25rem;
-    min-width: 200px;
-    max-width: 250px;
+    background: transparent;
+    padding: 1rem 0;
+    width: 100%;
+    min-width: 240px;
 }
 
 .tools-title {
-    color: #e2e8f0;
-    font-size: 1rem;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
     font-weight: 600;
-    margin: 0 0 1rem 0;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 1rem;
+    padding-left: 1rem;
 }
 
 .tools-list {
@@ -24,41 +23,55 @@
 
 .tool-item {
     display: flex;
-    align-items: flex-start;
-    gap: 0.75rem;
-    padding: 0.75rem;
-    background: rgba(30, 41, 59, 0.6);
-    border: 1px solid rgba(99, 102, 241, 0.2);
-    border-radius: 8px;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    background: transparent;
+    border: none;
+    border-radius: 0 2rem 2rem 0;
+    /* Pill shape (half) */
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all var(--transition-normal);
     text-align: left;
-    width: 100%;
+    width: 95%;
+    /* Leave room for animation */
+    color: var(--text-secondary);
+    position: relative;
+    overflow: hidden;
 }
 
 .tool-item:hover:not(.disabled) {
-    background: rgba(99, 102, 241, 0.15);
-    border-color: rgba(99, 102, 241, 0.4);
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    transform: translateX(4px);
 }
 
 .tool-item.selected {
-    background: rgba(99, 102, 241, 0.2);
-    border-color: #6366f1;
+    background: var(--gradient-primary);
+    color: white;
+    box-shadow: var(--shadow-glow);
+    font-weight: 500;
 }
 
 .tool-item.disabled {
     opacity: 0.5;
     cursor: not-allowed;
+    filter: grayscale(1);
 }
 
 .tool-checkbox {
-    color: #22c55e;
-    font-size: 1rem;
-    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    width: 24px;
+    height: 24px;
 }
 
-.tool-item.disabled .tool-checkbox {
-    color: #f59e0b;
+/* Icon for SimSwap */
+.tool-item .tool-checkbox svg,
+.tool-item .tool-checkbox span {
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
 
 .tool-info {
@@ -68,29 +81,42 @@
 }
 
 .tool-name {
-    color: #22d3ee;
-    font-size: 0.875rem;
+    font-size: 0.95rem;
     font-weight: 500;
 }
 
-.tool-item.selected .tool-name {
-    color: #a5f3fc;
+.tool-status {
+    opacity: 0.8;
+    font-size: 0.75rem;
+    font-weight: 400;
 }
 
-.tool-status {
-    color: #94a3b8;
-    font-size: 0.75rem;
-    font-style: italic;
+/* Gimmick: Shine effect on selected */
+.tool-item.selected::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(90deg,
+            transparent,
+            rgba(255, 255, 255, 0.2),
+            transparent);
+    animation: shimmer 3s infinite;
 }
 
 .tools-notes {
-    margin-top: 1rem;
-    padding-top: 0.75rem;
-    border-top: 1px solid rgba(99, 102, 241, 0.2);
+    margin-top: 2rem;
+    padding: 1rem;
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-md);
+    border-left: 3px solid var(--accent-primary);
 }
 
 .tools-notes p {
-    color: #64748b;
-    font-size: 0.7rem;
-    margin: 0.25rem 0;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    line-height: 1.5;
+    margin: 0;
 }

@@ -1,0 +1,75 @@
+.contact-page {
+    background: black;
+    min-height: 100vh;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 0;
+}
+
+.contact-header {
+    text-align: center;
+    margin-bottom: 4rem;
+}
+
+.contact-badge {
+    color: #4ade80;
+    border: 1px solid #4ade80;
+    padding: 0.5rem 1.5rem;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    margin-bottom: 2rem;
+    display: inline-block;
+}
+
+.contact-header h1 {
+    font-size: 3.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.contact-card {
+    background: #111;
+    border: 1px solid #333;
+    padding: 4rem 2rem;
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto;
+    border-radius: var(--radius-lg);
+}
+
+.contact-icon {
+    width: 64px;
+    height: 64px;
+    background: #2563eb;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin: 0 auto 1.5rem;
+}
+
+.contact-card h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.contact-email {
+    display: block;
+    font-size: 1.5rem;
+    color: #9ca3af;
+    margin-bottom: 1rem;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.contact-email:hover {
+    color: white;
+}
+
+.contact-hint {
+    color: #6b7280;
+    font-size: 0.9rem;
+}

@@ -5,7 +5,7 @@ import GenerationProgress from '../components/GenerationProgress';
 import ResultDisplay from '../components/ResultDisplay';
 import ColorEditor from '../components/ColorEditor';
 import { runSimSwap, runSimSwapMulti, getResultImageUrl } from '../services/api';
-import './Home.css';
+import './FaceSwapTool.css';
 
 // App States
 const STATES = {
@@ -15,7 +15,7 @@ const STATES = {
     EDITING: 'editing'
 };
 
-function Home() {
+function FaceSwapTool() {
     // Tool selection
     const [selectedTool, setSelectedTool] = useState('simswap-single');
 
@@ -26,9 +26,6 @@ function Home() {
     const [sourceFile, setSourceFile] = useState(null);
     const [sourceFiles, setSourceFiles] = useState([]); // For multi-face swap
     const [targetFile, setTargetFile] = useState(null);
-
-    // Region - Removed
-    // const [selectedRegion, setSelectedRegion] = useState(null);
 
     // Generation
     const [isGenerating, setIsGenerating] = useState(false);
@@ -62,14 +59,10 @@ function Home() {
         setError(null);
     }, []);
 
-
-
     const isMultiMode = selectedTool === 'simswap-multi';
     const canGenerate = isMultiMode
         ? (sourceFiles.length > 0 && targetFile)
         : (sourceFile && targetFile);
-
-    // Removed handleProceedToRegion
 
     const handleGenerate = async () => {
         if (!canGenerate) return;
@@ -118,7 +111,7 @@ function Home() {
         } catch (err) {
             console.error('Generation failed:', err);
             setError(err.message || 'เกิดข้อผิดพลาดในการสร้างภาพ');
-            setCurrentState(STATES.REGION);
+            setCurrentState(STATES.UPLOAD); // Go back to upload on error (or stay?) - previously was REGION but that's gone
         } finally {
             setIsGenerating(false);
         }
@@ -128,7 +121,6 @@ function Home() {
         setSourceFile(null);
         setSourceFiles([]);
         setTargetFile(null);
-        // setSelectedRegion(null); //- Removed
         setResultUrl(null);
         setError(null);
         setProgress(0);
@@ -143,26 +135,9 @@ function Home() {
         setCurrentState(STATES.RESULT);
     };
 
-    const handleBackToUpload = () => {
-        setCurrentState(STATES.UPLOAD);
-    };
-
     return (
-        <div className="home">
-            {/* Header */}
-            <header className="header">
-                <div className="container">
-                    <div className="header-content">
-                        <div className="logo">
-                            <span className="logo-icon">🎭</span>
-                            <span className="logo-text">FaceLab</span>
-                        </div>
-                        <div className="header-tagline">
-                            AI for face editing • modular services
-                        </div>
-                    </div>
-                </div>
-            </header>
+        <div className="tool-page">
+            <div className="background-decor"></div>
 
             {/* Main Layout with Tools Panel */}
             <div className="main-layout">
@@ -195,7 +170,6 @@ function Home() {
                                 completed={currentState !== STATES.UPLOAD}
                             />
                             <div className="step-line"></div>
-                            {/* Region Step Removed */}
                             <StepIndicator
                                 number={2}
                                 label="สร้างภาพ"
@@ -246,8 +220,6 @@ function Home() {
                         </div>
                     )}
 
-
-
                     {/* Generating State */}
                     {currentState === STATES.GENERATING && (
                         <GenerationProgress
@@ -284,13 +256,6 @@ function Home() {
                     )}
                 </main>
             </div>
-
-            {/* Footer */}
-            <footer className="footer">
-                <div className="container">
-                    <p>© 2024 FaceLab - AI Image Generation for Advertising</p>
-                </div>
-            </footer>
         </div>
     );
 }
@@ -307,4 +272,4 @@ function StepIndicator({ number, label, active, completed }) {
     );
 }
 
-export default Home;
+export default FaceSwapTool;

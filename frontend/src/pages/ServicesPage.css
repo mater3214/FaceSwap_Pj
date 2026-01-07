@@ -1,0 +1,132 @@
+.services-page {
+    background: var(--bg-primary);
+}
+
+.services-header {
+    padding: 5rem 0 3rem;
+    text-align: center;
+}
+
+.services-header h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+
+.services-header p {
+    font-size: 1.25rem;
+    color: var(--text-secondary);
+}
+
+.services-grid-section {
+    padding-bottom: 6rem;
+}
+
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+}
+
+.service-card {
+    background: white;
+    padding: 2.5rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-primary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: all var(--transition-bounce);
+    position: relative;
+    overflow: hidden;
+}
+
+.service-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-xl);
+}
+
+.service-icon-wrapper {
+    width: 80px;
+    height: 80px;
+    background: var(--bg-tertiary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+.service-icon {
+    font-size: 2.5rem;
+}
+
+.service-card h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+
+.service-card p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 2rem;
+    flex: 1;
+}
+
+.service-link {
+    font-weight: 600;
+    color: var(--accent-primary);
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-full);
+    background: var(--bg-tertiary);
+    transition: all var(--transition-fast);
+}
+
+.service-link:hover {
+    background: var(--accent-primary);
+    color: white;
+}
+
+/* Color Themes */
+.service-card.blue .service-icon-wrapper {
+    background: #e0f2fe;
+    color: #0284c7;
+}
+
+.service-card.purple .service-icon-wrapper {
+    background: #f3e8ff;
+    color: #9333ea;
+}
+
+.service-card.teal .service-icon-wrapper {
+    background: #ccfbf1;
+    color: #0d9488;
+}
+
+.service-card.orange .service-icon-wrapper {
+    background: #ffedd5;
+    color: #c2410c;
+}
+
+.service-card.blue:hover {
+    border-color: #38bdf8;
+}
+
+.service-card.purple:hover {
+    border-color: #a855f7;
+}
+
+.service-card.teal:hover {
+    border-color: #2dd4bf;
+}
+
+.service-card.orange:hover {
+    border-color: #fb923c;
+}

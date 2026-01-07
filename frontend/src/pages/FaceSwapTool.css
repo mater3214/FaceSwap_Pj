@@ -1,62 +1,22 @@
-.home {
-    min-height: 100vh;
+.tool-page {
+    flex: 1;
     display: flex;
     flex-direction: column;
     background: var(--bg-primary);
 }
 
-/* Header */
-.header {
-    background: white;
-    border-bottom: 1px solid var(--border-primary);
-    padding: 1rem 0;
-    position: sticky;
+/* Background Decoration */
+.background-decor {
+    position: fixed;
     top: 0;
-    z-index: 100;
-    box-shadow: var(--shadow-sm);
-}
-
-.header-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: var(--spacing-lg);
-}
-
-.logo {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    cursor: pointer;
-}
-
-.logo-icon {
-    font-size: 1.75rem;
-    filter: drop-shadow(0 2px 4px rgba(168, 85, 247, 0.4));
-}
-
-.logo-text {
-    font-size: 1.5rem;
-    font-weight: 700;
-    background: var(--gradient-text);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-.header-tagline {
-    color: var(--text-secondary);
-    font-size: 0.8rem;
-    padding: 0.4rem 1rem;
-    background: var(--bg-tertiary);
-    border-radius: var(--radius-full);
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.header-tagline::before {
-    content: '✨';
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(circle at 10% 20%, rgba(168, 85, 247, 0.03) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(14, 165, 233, 0.03) 0%, transparent 40%);
+    z-index: 0;
 }
 
 /* Main Layout with Sidebar */
@@ -74,8 +34,11 @@
     border-right: 1px solid var(--border-primary);
     width: 260px;
     min-height: calc(100vh - 73px);
-    /* 73px header roughly */
     padding: 2rem 1rem;
+    position: sticky;
+    top: 73px;
+    height: calc(100vh - 73px);
+    overflow-y: auto;
 }
 
 .main-content {
@@ -85,6 +48,8 @@
     gap: 2rem;
     padding: 3rem 4rem;
     background: var(--bg-primary);
+    position: relative;
+    z-index: 1;
 }
 
 .tool-header {
@@ -115,7 +80,6 @@
     align-items: center;
     justify-content: center;
     gap: 1rem;
-    /* Space between steps */
     background: white;
     padding: 0.75rem 2rem;
     border-radius: var(--radius-full);
@@ -155,7 +119,6 @@
 .step.completed .step-number {
     background: var(--success);
     color: white;
-    /* Green checkmark on white? No, white check on green */
 }
 
 .step-label {
@@ -233,17 +196,6 @@
 
 .close-btn:hover {
     transform: scale(1.1);
-}
-
-/* Footer */
-.footer {
-    background: white;
-    border-top: 1px solid var(--border-primary);
-    padding: 2rem 0;
-    text-align: center;
-    color: var(--text-tertiary);
-    font-size: 0.85rem;
-    margin-top: auto;
 }
 
 /* Responsive */
