@@ -12,7 +12,6 @@
 
 - **SimSwap (Single Face)** - สลับใบหน้าเดี่ยว
 - **SimSwap (Multi Face)** - สลับหลายใบหน้าพร้อมกัน
-- **Region Selector** - เลือกภูมิภาคเพื่อปรับโทนสี
 - **Color Editor** - ปรับแต่งสีภาพ
 - **DiFaReLi (Coming Soon)** - Relighting ใบหน้า
 
