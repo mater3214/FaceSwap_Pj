@@ -1,0 +1,19 @@
+name: bgrm
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - pytorch>=2.0.0
+  - torchvision>=0.15.0
+  - pytorch-cuda=11.8
+  - pip
+  - pip:
+    - fastapi>=0.100.0
+    - uvicorn>=0.23.0
+    - python-multipart>=0.0.6
+    - rembg>=2.0.50
+    - Pillow>=10.0.0
+    - numpy>=1.24.0

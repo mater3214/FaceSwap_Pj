@@ -150,18 +150,6 @@ function ImageUploader({
 
     return (
         <div className="image-uploader">
-            <div className="uploader-header">
-                <h3 className="upload-section-title">
-                    {isMultiMode ? 'Source faces (src)' : 'Source face (src)'}
-                </h3>
-                <p className="upload-section-desc">
-                    {isMultiMode
-                        ? 'Select multiple source face images'
-                        : 'Select one source face image'
-                    }
-                </p>
-            </div>
-
             <div className="upload-grid">
                 <UploadZone
                     type="source"
@@ -169,37 +157,29 @@ function ImageUploader({
                     files={sourceFiles}
                     onChange={isMultiMode ? onSourceFilesChange : onSourceChange}
                     inputRef={sourceInputRef}
-                    title={isMultiMode ? "รูปอ้างอิง (หลายหน้า)" : "รูปอ้างอิง (Source)"}
+                    title={isMultiMode ? "Source Faces" : "Source Face"}
                     description={isMultiMode
-                        ? "เลือกหลายรูปสำหรับหลายใบหน้า"
-                        : "หน้าที่จะนำไปใส่ในรูปเป้าหมาย"
+                        ? "Drop multiple face images"
+                        : "Drop a face image here"
                     }
                     icon={isMultiMode ? "👥" : "👤"}
                     isMulti={isMultiMode}
                 />
 
                 <div className="arrow-connector">
-                    <div className="arrow-line"></div>
                     <div className="arrow-icon">→</div>
-                    <div className="arrow-line"></div>
                 </div>
 
-                <div className="target-section">
-                    <div className="target-header">
-                        <h3 className="upload-section-title">Target image (dst)</h3>
-                        <p className="upload-section-desc">Select one target image</p>
-                    </div>
-                    <UploadZone
-                        type="target"
-                        file={targetFile}
-                        onChange={onTargetChange}
-                        inputRef={targetInputRef}
-                        title="รูปเป้าหมาย (Target)"
-                        description="รูปที่จะถูกเปลี่ยนหน้า"
-                        icon="🎯"
-                        isMulti={false}
-                    />
-                </div>
+                <UploadZone
+                    type="target"
+                    file={targetFile}
+                    onChange={onTargetChange}
+                    inputRef={targetInputRef}
+                    title="Target Image"
+                    description="Drop target image here"
+                    icon="🎯"
+                    isMulti={false}
+                />
             </div>
         </div>
     );

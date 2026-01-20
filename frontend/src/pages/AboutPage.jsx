@@ -1,9 +1,11 @@
 import SimpleAutoSlider from '../components/SimpleAutoSlider';
+import AnimatedBackground from '../components/AnimatedBackground';
 import './AboutPage.css';
 
 function AboutPage() {
     return (
         <div className="about-page">
+            <AnimatedBackground />
             <section className="about-hero">
                 <div className="container">
                     <div className="about-grid">

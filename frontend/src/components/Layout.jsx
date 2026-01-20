@@ -1,15 +1,18 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
+import ToolsPanel from './ToolsPanel';
 import './Layout.css';
 
 function Layout() {
     const location = useLocation();
+
+    // Show sidebar on tool pages
+    const isToolPage = location.pathname.startsWith('/tool');
 
     return (
         <div className="layout">
             <header className="main-header">
                 <div className="container header-container">
                     <Link to="/" className="logo">
-                        <span className="logo-icon">🎭</span>
                         <span className="logo-text">FaceLab</span>
                     </Link>
 
@@ -53,9 +56,18 @@ function Layout() {
                 </div>
             </header>
 
-            <main className="main-content-wrapper">
-                <Outlet />
-            </main>
+            <div className="main-body">
+                {/* Sidebar for tool pages */}
+                {isToolPage && (
+                    <aside className="global-sidebar">
+                        <ToolsPanel />
+                    </aside>
+                )}
+
+                <main className={`main-content-wrapper ${isToolPage ? 'with-sidebar' : ''}`}>
+                    <Outlet />
+                </main>
+            </div>
 
             <footer className="main-footer">
                 <div className="container">

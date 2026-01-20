@@ -94,6 +94,21 @@
 .item-image.result-image {
     border-color: var(--accent-primary);
     box-shadow: var(--shadow-glow);
+    aspect-ratio: auto;
+    min-height: 200px;
+    max-height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f9fa;
+}
+
+.item-image.result-image img {
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
 }
 
 .operator {

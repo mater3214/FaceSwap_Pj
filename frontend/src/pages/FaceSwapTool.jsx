@@ -1,23 +1,40 @@
-import { useState, useCallback } from 'react';
-import ToolsPanel from '../components/ToolsPanel';
+import { useState, useCallback, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import ImageUploader from '../components/ImageUploader';
 import GenerationProgress from '../components/GenerationProgress';
 import ResultDisplay from '../components/ResultDisplay';
 import ColorEditor from '../components/ColorEditor';
-import { runSimSwap, runSimSwapMulti, getResultImageUrl } from '../services/api';
+import FaceMapper from '../components/FaceMapper';
+import { runSimSwap, runSimSwapMultiWithMapping, getResultImageUrl } from '../services/api';
 import './FaceSwapTool.css';
+import './HeadNeRFTool.css';
 
 // App States
 const STATES = {
     UPLOAD: 'upload',
+    MAPPING: 'mapping',  // New state for face mapping in multi mode
     GENERATING: 'generating',
     RESULT: 'result',
     EDITING: 'editing'
 };
 
 function FaceSwapTool() {
+    const location = useLocation();
+
+    // Determine tool from URL
+    const getToolFromPath = () => {
+        if (location.pathname.includes('simswap-multi')) return 'simswap-multi';
+        if (location.pathname.includes('simswap')) return 'simswap-single';
+        return 'simswap-single';
+    };
+
     // Tool selection
-    const [selectedTool, setSelectedTool] = useState('simswap-single');
+    const [selectedTool, setSelectedTool] = useState(getToolFromPath);
+
+    // Update tool when route changes
+    useEffect(() => {
+        setSelectedTool(getToolFromPath());
+    }, [location.pathname]);
 
     // App state
     const [currentState, setCurrentState] = useState(STATES.UPLOAD);
@@ -33,6 +50,7 @@ function FaceSwapTool() {
     const [status, setStatus] = useState('');
     const [resultUrl, setResultUrl] = useState(null);
     const [error, setError] = useState(null);
+    const [faceMapping, setFaceMapping] = useState(null);  // Face mapping for multi mode
 
     // Handlers
     const handleToolChange = (toolId) => {
@@ -64,9 +82,26 @@ function FaceSwapTool() {
         ? (sourceFiles.length > 0 && targetFile)
         : (sourceFile && targetFile);
 
-    const handleGenerate = async () => {
-        if (!canGenerate) return;
+    // For multi mode: go to mapping step first
+    const handleProceedToMapping = () => {
+        if (sourceFiles.length > 0 && targetFile) {
+            setCurrentState(STATES.MAPPING);
+        }
+    };
 
+    // Called after face mapping is complete
+    const handleMappingComplete = async (mapping) => {
+        setFaceMapping(mapping);
+        await handleGenerateWithMapping(mapping);
+    };
+
+    // Back from mapping to upload
+    const handleBackFromMapping = () => {
+        setCurrentState(STATES.UPLOAD);
+    };
+
+    // Generate with optional mapping
+    const handleGenerateWithMapping = async (mapping = null) => {
         try {
             setCurrentState(STATES.GENERATING);
             setIsGenerating(true);
@@ -79,18 +114,18 @@ function FaceSwapTool() {
 
             await new Promise(r => setTimeout(r, 500));
             setProgress(30);
-            setStatus('กำลังวิเคราะห์ใบหน้า...');
+            setStatus('กำลังสลับใบหน้า...');
 
             let resultImageUrl = null;
 
             try {
                 let result;
                 if (isMultiMode) {
-                    // Multi face swap
-                    result = await runSimSwapMulti(sourceFiles, targetFile);
+                    // Multi face swap with mapping
+                    result = await runSimSwapMultiWithMapping(sourceFiles, targetFile, mapping);
                 } else {
                     // Single face swap
-                    result = await runSimSwap(sourceFile, targetFile, null); // Region ID is null
+                    result = await runSimSwap(sourceFile, targetFile, null);
                 }
                 resultImageUrl = getResultImageUrl(result.result_url);
             } catch (apiError) {
@@ -111,10 +146,16 @@ function FaceSwapTool() {
         } catch (err) {
             console.error('Generation failed:', err);
             setError(err.message || 'เกิดข้อผิดพลาดในการสร้างภาพ');
-            setCurrentState(STATES.UPLOAD); // Go back to upload on error (or stay?) - previously was REGION but that's gone
+            setCurrentState(STATES.UPLOAD);
         } finally {
             setIsGenerating(false);
         }
+    };
+
+    // For single mode - generate directly
+    const handleGenerate = async () => {
+        if (!canGenerate) return;
+        await handleGenerateWithMapping(null);
     };
 
     const handleReset = () => {
@@ -124,6 +165,7 @@ function FaceSwapTool() {
         setResultUrl(null);
         setError(null);
         setProgress(0);
+        setFaceMapping(null);
         setCurrentState(STATES.UPLOAD);
     };
 
@@ -139,76 +181,72 @@ function FaceSwapTool() {
         <div className="tool-page">
             <div className="background-decor"></div>
 
-            {/* Main Layout with Tools Panel */}
-            <div className="main-layout">
-                {/* Tools Panel - Left Sidebar */}
-                <aside className="sidebar">
-                    <ToolsPanel
-                        selectedTool={selectedTool}
-                        onToolChange={handleToolChange}
-                    />
-                </aside>
+            {/* Main Content */}
+            <main className="main-content tool-content-area">
+                {/* Simple Header */}
+                <header className="headnerf-header">
+                    <h1>SimSwap</h1>
+                    <p>High-fidelity face swapping for single portraits or group photos</p>
+                </header>
 
-                {/* Main Content */}
-                <main className="main-content">
-                    {/* Tool Title */}
-                    <div className="tool-header">
-                        <h2>
-                            {selectedTool === 'simswap-single' && 'SimSwap (Single Face)'}
-                            {selectedTool === 'simswap-multi' && 'SimSwap (Multi Face)'}
-                            {selectedTool === 'difareli' && 'DiFaReLi (Relighting)'}
-                        </h2>
+                {/* Progress Steps */}
+                <div className="progress-steps">
+                    <div className="steps">
+                        <StepIndicator
+                            number={1}
+                            label="อัพโหลด"
+                            active={currentState === STATES.UPLOAD}
+                            completed={currentState !== STATES.UPLOAD}
+                        />
+                        <div className="step-line"></div>
+                        <StepIndicator
+                            number={2}
+                            label="สร้างภาพ"
+                            active={currentState === STATES.GENERATING}
+                            completed={[STATES.RESULT, STATES.EDITING].includes(currentState)}
+                        />
+                        <div className="step-line"></div>
+                        <StepIndicator
+                            number={3}
+                            label="ปรับแต่ง"
+                            active={currentState === STATES.EDITING}
+                            completed={false}
+                        />
                     </div>
+                </div>
 
-                    {/* Progress Steps */}
-                    <div className="progress-steps">
-                        <div className="steps">
-                            <StepIndicator
-                                number={1}
-                                label="อัพโหลด"
-                                active={currentState === STATES.UPLOAD}
-                                completed={currentState !== STATES.UPLOAD}
-                            />
-                            <div className="step-line"></div>
-                            <StepIndicator
-                                number={2}
-                                label="สร้างภาพ"
-                                active={currentState === STATES.GENERATING}
-                                completed={[STATES.RESULT, STATES.EDITING].includes(currentState)}
-                            />
-                            <div className="step-line"></div>
-                            <StepIndicator
-                                number={3}
-                                label="ปรับแต่ง"
-                                active={currentState === STATES.EDITING}
-                                completed={false}
-                            />
-                        </div>
+                {/* Error Display */}
+                {error && (
+                    <div className="error-banner">
+                        <span className="error-icon">⚠️</span>
+                        <span>{error}</span>
+                        <button className="close-btn" onClick={() => setError(null)}>×</button>
                     </div>
+                )}
 
-                    {/* Error Display */}
-                    {error && (
-                        <div className="error-banner">
-                            <span className="error-icon">⚠️</span>
-                            <span>{error}</span>
-                            <button className="close-btn" onClick={() => setError(null)}>×</button>
-                        </div>
-                    )}
+                {/* Upload State */}
+                {currentState === STATES.UPLOAD && (
+                    <div className="content-section">
+                        <ImageUploader
+                            sourceFile={sourceFile}
+                            sourceFiles={sourceFiles}
+                            targetFile={targetFile}
+                            onSourceChange={handleSourceChange}
+                            onSourceFilesChange={handleSourceFilesChange}
+                            onTargetChange={handleTargetChange}
+                            isMultiMode={isMultiMode}
+                        />
 
-                    {/* Upload State */}
-                    {currentState === STATES.UPLOAD && (
-                        <div className="content-section">
-                            <ImageUploader
-                                sourceFile={sourceFile}
-                                sourceFiles={sourceFiles}
-                                targetFile={targetFile}
-                                onSourceChange={handleSourceChange}
-                                onSourceFilesChange={handleSourceFilesChange}
-                                onTargetChange={handleTargetChange}
-                                isMultiMode={isMultiMode}
-                            />
-
-                            <div className="section-actions">
+                        <div className="section-actions">
+                            {isMultiMode ? (
+                                <button
+                                    className="btn btn-primary btn-lg"
+                                    disabled={!canGenerate}
+                                    onClick={handleProceedToMapping}
+                                >
+                                    🎯 ตั้งค่า Face Mapping
+                                </button>
+                            ) : (
                                 <button
                                     className="btn btn-primary btn-lg"
                                     disabled={!canGenerate}
@@ -216,46 +254,56 @@ function FaceSwapTool() {
                                 >
                                     🚀 เริ่มสร้างภาพ
                                 </button>
-                            </div>
+                            )}
                         </div>
-                    )}
+                    </div>
+                )}
 
-                    {/* Generating State */}
-                    {currentState === STATES.GENERATING && (
-                        <GenerationProgress
-                            isGenerating={isGenerating}
-                            progress={progress}
-                            status={status}
+                {/* Face Mapping State (Multi mode only) */}
+                {currentState === STATES.MAPPING && isMultiMode && (
+                    <FaceMapper
+                        sourceFiles={sourceFiles}
+                        targetFile={targetFile}
+                        onMappingComplete={handleMappingComplete}
+                        onBack={handleBackFromMapping}
+                    />
+                )}
+
+                {/* Generating State */}
+                {currentState === STATES.GENERATING && (
+                    <GenerationProgress
+                        isGenerating={isGenerating}
+                        progress={progress}
+                        status={status}
+                    />
+                )}
+
+                {/* Result State */}
+                {currentState === STATES.RESULT && (
+                    <div className="content-section">
+                        <ResultDisplay
+                            sourceFile={sourceFile}
+                            sourceFiles={sourceFiles}
+                            targetFile={targetFile}
+                            resultUrl={resultUrl}
+                            onReset={handleReset}
+                            onProceedToEdit={handleProceedToEdit}
+                            isMultiMode={isMultiMode}
                         />
-                    )}
+                    </div>
+                )}
 
-                    {/* Result State */}
-                    {currentState === STATES.RESULT && (
-                        <div className="content-section">
-                            <ResultDisplay
-                                sourceFile={sourceFile}
-                                sourceFiles={sourceFiles}
-                                targetFile={targetFile}
-                                resultUrl={resultUrl}
-                                onReset={handleReset}
-                                onProceedToEdit={handleProceedToEdit}
-                                isMultiMode={isMultiMode}
-                            />
-                        </div>
-                    )}
-
-                    {/* Editing State */}
-                    {currentState === STATES.EDITING && (
-                        <div className="content-section">
-                            <ColorEditor
-                                resultUrl={resultUrl}
-                                selectedRegion={null}
-                                onBack={handleBackFromEdit}
-                            />
-                        </div>
-                    )}
-                </main>
-            </div>
+                {/* Editing State */}
+                {currentState === STATES.EDITING && (
+                    <div className="content-section">
+                        <ColorEditor
+                            resultUrl={resultUrl}
+                            selectedRegion={null}
+                            onBack={handleBackFromEdit}
+                        />
+                    </div>
+                )}
+            </main>
         </div>
     );
 }

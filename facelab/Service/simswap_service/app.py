@@ -1,20 +1,21 @@
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, UploadFile, File, HTTPException, Form
 from typing import List
 from fastapi.responses import FileResponse
 import uuid
 from pathlib import Path
 import sys
-import os
 
 BASE = Path(__file__).resolve().parent
 SIMSWAP_ROOT = (BASE / "SimSwap").resolve()
-
-# Change to SimSwap directory and add to path
+import os
 os.chdir(str(SIMSWAP_ROOT))
+
 sys.path.insert(0, str(SIMSWAP_ROOT))
 
-# Note: Heavy imports (test_wholeimage_swapsingle, etc.) are done INSIDE endpoints
-# to allow FastAPI to start even without ML dependencies installed.
+from test_wholeimage_swapsingle import run_swap
+
+# Defer importing heavy SimSwap modules until a request is received
+# to allow the FastAPI app to start even if ML dependencies aren't installed.
 
 app = FastAPI(title="SimSwap Service")
 
@@ -64,7 +65,7 @@ def run(src: UploadFile = File(...), dst: UploadFile = File(...)):
     dst_path = UPLOAD / f"{job}_dst.png"
     save_upload(src, src_path)
     save_upload(dst, dst_path)
-    arc_path = r"C:\Users\painh\Desktop\CS FINALPROJECT\facelab\Service\simswap_service\SimSwap\arcface_model\arcface_checkpoint.tar"
+    arc_path = str(SIMSWAP_ROOT / "arcface_model" / "arcface_checkpoint.tar")
 
     try:
         run_swap(str(src_path), str(dst_path), str(OUTPUT), crop_size=224, arc_path=arc_path)
@@ -82,12 +83,12 @@ def run(src: UploadFile = File(...), dst: UploadFile = File(...)):
 
 
 @app.post("/run_multi")
-def run_multi(src: List[UploadFile] = File(...), dst: UploadFile = File(...)):
+def run_multi(src: List[UploadFile] = File(...), dst: UploadFile = File(...), mapping: str = Form("")):
     try:
         from SimSwap.test_wholeimage_swapmulti import run_swap
     except Exception as e:
         import shutil, os
-        def run_swap(src, dst, output_dir, crop_size=224, use_mask=False, no_simswaplogo=True):
+        def run_swap(src, dst, output_dir, crop_size=224, use_mask=False, no_simswaplogo=True, mapping=""):
             os.makedirs(output_dir, exist_ok=True)
             out_path = os.path.join(output_dir, 'result_whole_swapmulti.jpg')
             try:
@@ -109,12 +110,12 @@ def run_multi(src: List[UploadFile] = File(...), dst: UploadFile = File(...)):
     dst_path = UPLOAD / f"{job}_dst.png"
     save_upload(dst, dst_path)
     save_upload(dst, dst_path)
-    arc_path = r"C:\Users\painh\Desktop\CS FINALPROJECT\facelab\Service\simswap_service\SimSwap\arcface_model\arcface_checkpoint.tar"
+    arc_path = str(SIMSWAP_ROOT / "arcface_model" / "arcface_checkpoint.tar")
 
     try:
         # pass multiple source paths joined with ';' — test_wholeimage_swapmulti supports this
         pic_a_arg = ';'.join(src_paths)
-        run_swap(pic_a_arg, str(dst_path), str(OUTPUT), crop_size=224, arc_path=arc_path)
+        run_swap(pic_a_arg, str(dst_path), str(OUTPUT), crop_size=224, arc_path=arc_path, mapping=mapping)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"SimSwap (multi) failed: {e}")
 
@@ -123,3 +124,60 @@ def run_multi(src: List[UploadFile] = File(...), dst: UploadFile = File(...)):
         raise HTTPException(500, "No output produced")
 
     return FileResponse(str(out_img))
+
+
+@app.post("/detect_faces")
+def detect_faces(dst: UploadFile = File(...)):
+    # Save the uploaded file
+    job = uuid.uuid4().hex[:10]
+    dst_path = UPLOAD / f"{job}_dst_detect.png"
+    save_upload(dst, dst_path)
+
+    try:
+        # Use SimSwap's face detection logic
+        import cv2
+        import numpy as np
+        # Initialize Face_detect_crop locally or use shared
+        try:
+            from SimSwap.insightface_func.face_detect_crop_multi import Face_detect_crop
+        except ImportError:
+             print("SimSwap import failed inside detect_faces")
+             raise
+
+        # Assuming model paths are relative to SIMSWAP_ROOT
+        app_detect = Face_detect_crop(name='antelopeV2', root=str(SIMSWAP_ROOT / 'insightface_func/models'))
+        app_detect.prepare(ctx_id=0, det_thresh=0.6, det_size=(640,640))
+        
+        img = cv2.imread(str(dst_path))
+        if img is None:
+            raise HTTPException(400, "Could not read image")
+            
+        crop_size = 224
+        img_align_crop_list, _ = app_detect.get(img, crop_size)
+        
+        if not img_align_crop_list:
+            return {"faces": []}
+
+        face_list = []
+        for i, face_img in enumerate(img_align_crop_list):
+            face_filename = f"{job}_face_{i}.png"
+            face_path = UPLOAD / face_filename
+            cv2.imwrite(str(face_path), face_img)
+            
+            face_list.append({
+                "index": i,
+                "file_path": f"/uploads/{face_filename}"
+            })
+            
+        return {"faces": face_list, "job_id": job}
+        
+    except Exception as e:
+        print(f"Error detecting faces: {e}")
+        raise HTTPException(500, f"Face detection failed: {e}")
+
+@app.get("/uploads/{filename}")
+def get_upload(filename: str):
+    path = UPLOAD / filename
+    if not path.exists():
+        raise HTTPException(404, "File not found")
+    return FileResponse(str(path))

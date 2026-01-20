@@ -1,0 +1,198 @@
+.face-mapper {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.mapper-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.mapper-header h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.mapper-header p {
+    color: var(--text-secondary);
+}
+
+.mapper-error {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #dc2626;
+    padding: 1rem;
+    border-radius: 12px;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.mapper-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    gap: 1rem;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(139, 92, 246, 0.2);
+    border-top-color: #8b5cf6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.mapping-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 2rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.faces-section {
+    flex: 1;
+    min-width: 280px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.faces-section h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.faces-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 1rem;
+}
+
+.face-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.face-item img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 12px;
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    transition: all 0.2s;
+}
+
+.face-item.source-face img {
+    border-color: rgba(139, 92, 246, 0.3);
+}
+
+.face-item.target-face img {
+    border-color: rgba(6, 182, 212, 0.3);
+}
+
+.face-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--text-secondary);
+}
+
+.source-face .face-label {
+    background: rgba(139, 92, 246, 0.1);
+    color: #7c3aed;
+}
+
+.target-face .face-label {
+    background: rgba(6, 182, 212, 0.1);
+    color: #0891b2;
+}
+
+.mapping-arrow {
+    font-size: 2rem;
+    color: var(--text-tertiary);
+    padding: 2rem 1rem;
+}
+
+.assign-select {
+    width: 100%;
+    padding: 6px 10px;
+    font-size: 0.75rem;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    margin-top: 0.25rem;
+}
+
+.assign-select:focus {
+    outline: none;
+    border-color: #8b5cf6;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+.assigned-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    transform: translate(30%, -30%);
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.4);
+}
+
+.no-faces {
+    color: var(--text-tertiary);
+    text-align: center;
+    padding: 2rem;
+}
+
+.mapper-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.mapper-actions .btn {
+    min-width: 160px;
+}
+
+@media (max-width: 768px) {
+    .mapping-content {
+        flex-direction: column;
+    }
+
+    .mapping-arrow {
+        transform: rotate(90deg);
+        padding: 1rem;
+    }
+}

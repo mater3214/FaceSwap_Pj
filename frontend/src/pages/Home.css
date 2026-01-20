@@ -26,22 +26,16 @@
 .logo {
     display: flex;
     align-items: center;
-    gap: var(--spacing-sm);
-    cursor: pointer;
-}
-
-.logo-icon {
-    font-size: 1.75rem;
-    filter: drop-shadow(0 2px 4px rgba(168, 85, 247, 0.4));
 }
 
 .logo-text {
-    font-size: 1.5rem;
+    font-size: 1.75rem;
     font-weight: 700;
-    background: var(--gradient-text);
-    background-clip: text;
+    background: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.02em;
 }
 
 .header-tagline {

@@ -1,0 +1,22 @@
+name: headnerf
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - pytorch>=2.0.0
+  - torchvision>=0.15.0
+  - pytorch-cuda=11.8
+  - pip
+  - pip:
+    - fastapi>=0.100.0
+    - uvicorn>=0.23.0
+    - python-multipart>=0.0.6
+    - opencv-python>=4.8.0
+    - Pillow>=10.0.0
+    - numpy>=1.24.0
+    - face_alignment>=1.3.5
+    - scipy>=1.10.0
+    - kornia>=0.7.0

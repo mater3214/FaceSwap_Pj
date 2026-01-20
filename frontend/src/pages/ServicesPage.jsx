@@ -1,50 +1,52 @@
 import { Link } from 'react-router-dom';
+import AnimatedBackground from '../components/AnimatedBackground';
 import './ServicesPage.css';
 
 function ServicesPage() {
     const services = [
         {
-            title: "SimSwap (Face Swap)",
-            description: "A seamless multi-platform tool designed for individual users. Experience high-quality face swapping for images with zero latency.",
+            title: "SimSwap",
+            description: "High-quality AI face swapping for images. Seamless identity transfer with state-of-the-art neural networks.",
             icon: "🎭",
             link: "/tool/simswap-single",
             cta: "Try Now",
-            color: "blue"
-        },
-        /* Temporarily hidden as per user request
-        {
-            title: "Enterprise Solutions",
-            description: "From high-precision tools for individuals to enterprise-grade API integration. Leverage our state-of-the-art technology.",
-            icon: "🏢",
-            link: "#enterprise",
-            cta: "Contact Sales",
-            color: "purple"
+            color: "blue",
+            features: ["HD Quality", "Fast Processing", "Multi-face Support"]
         },
         {
-            title: "Commercial License",
-            description: "Flexible commercial licenses for our proprietary and open-source models to scale your business.",
-            icon: "📜",
-            link: "#license",
-            cta: "Learn More",
-            color: "teal"
+            title: "HeadNeRF",
+            description: "Neural Radiance Field for parametric 3D head generation. Real-time blending and pose control.",
+            icon: "🧠",
+            link: "/tool/headnerf",
+            cta: "Try Now",
+            color: "purple",
+            features: ["3D Rendering", "Pose Control", "Real-time Preview"]
         },
         {
-            title: "Face Recognition SDK",
-            description: "Empower your applications with our comprehensive Face Recognition SDK. Full licensing and technical support included.",
-            icon: "🛡️",
-            link: "#sdk",
-            cta: "Explore SDK",
-            color: "orange"
+            title: "Background Removal",
+            description: "AI-powered background removal with transparent, solid color, or custom image replacement options.",
+            icon: "✂️",
+            link: "/tool/bg-removal",
+            cta: "Try Now",
+            color: "teal",
+            features: ["Instant Remove", "Custom Backgrounds", "Batch Processing"]
         }
-        */
     ];
 
     return (
         <div className="services-page">
+            <AnimatedBackground />
+
             <section className="services-header">
                 <div className="container">
-                    <h1>FaceLab Services</h1>
-                    <p>Your Trusted Partner in Facial AI Excellence</p>
+                    <div className="header-badge">
+                        <span className="badge-dot"></span>
+                        AI-Powered Services
+                    </div>
+                    <h1>
+                        <span className="gradient-text">FaceLab</span> Services
+                    </h1>
+                    <p className="header-subtitle">Your Trusted Partner in Facial AI Excellence</p>
                 </div>
             </section>
 
@@ -52,25 +54,55 @@ function ServicesPage() {
                 <div className="container">
                     <div className="services-grid">
                         {services.map((service, index) => (
-                            <div key={index} className={`service-card ${service.color}`}>
+                            <div
+                                key={index}
+                                className={`service-card ${service.color}`}
+                                style={{ animationDelay: `${index * 0.1}s` }}
+                            >
+                                {/* Card Glow Effect */}
+                                <div className="card-glow"></div>
+
                                 <div className="service-icon-wrapper">
                                     <span className="service-icon">{service.icon}</span>
+                                    <div className="icon-ring"></div>
                                 </div>
+
                                 <h3>{service.title}</h3>
                                 <p>{service.description}</p>
+
+                                {/* Feature Tags */}
+                                <div className="feature-tags">
+                                    {service.features.map((feature, idx) => (
+                                        <span key={idx} className="feature-tag">
+                                            {feature}
+                                        </span>
+                                    ))}
+                                </div>
+
                                 <div className="service-footer">
-                                    {service.link.startsWith('#') ? (
-                                        <a href={service.link} className="service-link">
-                                            {service.cta} →
-                                        </a>
-                                    ) : (
-                                        <Link to={service.link} className="service-link">
-                                            {service.cta} →
-                                        </Link>
-                                    )}
+                                    <Link to={service.link} className="service-link">
+                                        <span>{service.cta}</span>
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                            <path d="M5 12h14M12 5l7 7-7 7" />
+                                        </svg>
+                                    </Link>
                                 </div>
                             </div>
                         ))}
+                    </div>
+
+                    {/* Bottom CTA */}
+                    <div className="services-cta">
+                        <div className="cta-content">
+                            <h3>Need Custom Solutions?</h3>
+                            <p>We offer tailored AI solutions for your specific needs</p>
+                        </div>
+                        <Link to="/contact" className="cta-button">
+                            Contact Us
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path d="M5 12h14M12 5l7 7-7 7" />
+                            </svg>
+                        </Link>
                     </div>
                 </div>
             </section>
