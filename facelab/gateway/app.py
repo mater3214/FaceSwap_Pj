@@ -71,10 +71,11 @@ def simswap(src: UploadFile = File(...), dst: UploadFile = File(...)):
         return JSONResponse(status_code=r.status_code, content={"detail": r.text})
 
     # บันทึกผลลัพธ์เป็นไฟล์ static เพื่อให้ <img src=...> เรียกได้
-    out_path = STATIC_DIR / "simswap_result.png"
+    result_filename = f"simswap_{uuid.uuid4().hex[:8]}.png"
+    out_path = STATIC_DIR / result_filename
     out_path.write_bytes(r.content)
 
-    return {"ok": True, "result_url": "/static/simswap_result.png"}
+    return {"ok": True, "result_url": f"/static/{result_filename}"}
 
 
 
@@ -188,10 +189,11 @@ async def simswap_multi_upload(src: list[UploadFile] = File(...), dst: UploadFil
     if r.status_code != 200:
         return JSONResponse(status_code=r.status_code, content={"detail": r.text})
 
-    out_path = STATIC_DIR / "simswap_result_multi.png"
+    result_filename = f"simswap_multi_{uuid.uuid4().hex[:8]}.png"
+    out_path = STATIC_DIR / result_filename
     out_path.write_bytes(r.content)
 
-    return {"ok": True, "result_url": "/static/simswap_result_multi.png"}
+    return {"ok": True, "result_url": f"/static/{result_filename}"}
 
 
 @app.post("/api/background_removal")

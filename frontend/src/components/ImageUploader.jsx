@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import './ImageUploader.css';
 
 function ImageUploader({
@@ -11,8 +11,47 @@ function ImageUploader({
     isMultiMode = false
 }) {
     const [dragOver, setDragOver] = useState({ source: false, target: false });
+    const [previewUrls, setPreviewUrls] = useState({ source: null, target: null, multi: [] });
     const sourceInputRef = useRef(null);
     const targetInputRef = useRef(null);
+
+    // Cleanup object URLs on unmount or when files change
+    useEffect(() => {
+        return () => {
+            // Revoke all URLs on cleanup
+            if (previewUrls.source) URL.revokeObjectURL(previewUrls.source);
+            if (previewUrls.target) URL.revokeObjectURL(previewUrls.target);
+            previewUrls.multi.forEach(url => URL.revokeObjectURL(url));
+        };
+    }, []);
+
+    // Update preview URLs when files change
+    useEffect(() => {
+        // Cleanup old URLs
+        if (previewUrls.source) URL.revokeObjectURL(previewUrls.source);
+
+        // Create new URL
+        const newUrl = sourceFile ? URL.createObjectURL(sourceFile) : null;
+        setPreviewUrls(prev => ({ ...prev, source: newUrl }));
+    }, [sourceFile]);
+
+    useEffect(() => {
+        // Cleanup old URLs
+        if (previewUrls.target) URL.revokeObjectURL(previewUrls.target);
+
+        // Create new URL
+        const newUrl = targetFile ? URL.createObjectURL(targetFile) : null;
+        setPreviewUrls(prev => ({ ...prev, target: newUrl }));
+    }, [targetFile]);
+
+    useEffect(() => {
+        // Cleanup old URLs
+        previewUrls.multi.forEach(url => URL.revokeObjectURL(url));
+
+        // Create new URLs
+        const newUrls = sourceFiles.map(f => URL.createObjectURL(f));
+        setPreviewUrls(prev => ({ ...prev, multi: newUrls }));
+    }, [sourceFiles]);
 
     const handleDragOver = useCallback((e, type) => {
         e.preventDefault();
@@ -61,9 +100,12 @@ function ImageUploader({
         }
     }, []);
 
-    const createPreview = (file) => {
-        if (!file) return null;
-        return URL.createObjectURL(file);
+    // Get preview URL from state instead of creating new ones
+    const getPreviewUrl = (type, index = 0) => {
+        if (type === 'source') return previewUrls.source;
+        if (type === 'target') return previewUrls.target;
+        if (type === 'multi') return previewUrls.multi[index];
+        return null;
     };
 
     const UploadZone = ({
@@ -103,7 +145,7 @@ function ImageUploader({
                                 {files.slice(0, 4).map((f, i) => (
                                     <img
                                         key={i}
-                                        src={createPreview(f)}
+                                        src={getPreviewUrl('multi', i)}
                                         alt={`Source ${i + 1}`}
                                         className="preview-image-small"
                                     />
@@ -114,7 +156,7 @@ function ImageUploader({
                             </div>
                         ) : (
                             <img
-                                src={createPreview(file)}
+                                src={getPreviewUrl(type)}
                                 alt={title}
                                 className="preview-image"
                             />

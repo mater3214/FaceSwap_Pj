@@ -407,8 +407,16 @@ async def fit_image(image: UploadFile = File(...)):
                 f.write(f"{pt[1]}\n")
         
         # Step 3: Fit 3DMM
-        sys.path.insert(0, str(HEADNERF_ROOT / "Fitting3DMM"))
-        from Fitting3DMM.FittingNL3DMM import FittingNL3DMM
+        # Note: This requires pytorch3d which may not be installed
+        try:
+            sys.path.insert(0, str(HEADNERF_ROOT / "Fitting3DMM"))
+            from Fitting3DMM.FittingNL3DMM import FittingNL3DMM
+        except ModuleNotFoundError as e:
+            missing_module = str(e).split("'")[1] if "'" in str(e) else str(e)
+            return {
+                "ok": False, 
+                "error": f"Missing dependency: {missing_module}. HeadNeRF fitting requires pytorch3d. Please install with: pip install pytorch3d or use pre-fitted samples instead."
+            }
         
         fitter_3dmm = FittingNL3DMM(
             img_size=512,

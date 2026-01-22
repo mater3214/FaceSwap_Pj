@@ -147,6 +147,15 @@ function HeadNeRFTool() {
         setTimeout(doRender, 50);
     };
 
+    const handleExport = () => {
+        if (outputImage) {
+            const link = document.createElement('a');
+            link.href = outputImage;
+            link.download = `headnerf-output-${Date.now()}.png`;
+            link.click();
+        }
+    };
+
     const handleFitFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -223,139 +232,165 @@ function HeadNeRFTool() {
                     className={`tab-item ${activeTab === 'blend' ? 'active' : ''}`}
                     onClick={() => setActiveTab('blend')}
                 >
-                    ⚙️ Blending
+                    <span>⚙️</span> Blending
                 </button>
                 <button
                     className={`tab-item ${activeTab === 'fit' ? 'active' : ''}`}
                     onClick={() => setActiveTab('fit')}
                 >
-                    📷 Fitting
+                    <span>📷</span> Fitting
                 </button>
             </div>
 
             {/* Main Content */}
             {activeTab === 'blend' ? (
-                <div className="blend-layout">
-                    {/* Output - Left Side */}
-                    <div className="output-section">
-                        <div className="output-frame">
-                            {isLoading ? (
-                                <div className="output-loading">
-                                    <span className="spinner large"></span>
-                                    <p>Loading HeadNeRF...</p>
+                <>
+                    <div className="blend-layout">
+                        {/* Output Section - Left Side with Grid Background */}
+                        <div className="output-section">
+                            <div className="output-frame">
+                                {isLoading ? (
+                                    <div className="output-loading">
+                                        <span className="spinner large"></span>
+                                        <p>Loading HeadNeRF...</p>
+                                    </div>
+                                ) : outputImage ? (
+                                    <img src={outputImage} alt="Rendered" />
+                                ) : (
+                                    <div className="output-placeholder">
+                                        <span>🖼️</span>
+                                        <p>Output will appear here</p>
+                                    </div>
+                                )}
+                                {isRendering && <div className="render-indicator">Rendering...</div>}
+                            </div>
+                        </div>
+
+                        {/* Controls Section - Right Sidebar */}
+                        <div className="controls-section">
+                            {/* Source Selection */}
+                            <div className="sliders-panel">
+                                <div className="slider-group-header">
+                                    <span>📍 Source Selection</span>
                                 </div>
-                            ) : outputImage ? (
-                                <img src={outputImage} alt="Rendered" />
-                            ) : (
-                                <div className="output-placeholder">
-                                    <span>🖼️</span>
-                                    <p>Output</p>
+                                <div className="identity-row">
+                                    <div className="identity-item">
+                                        <span className="source-label">Source A</span>
+                                        <div className="identity-avatar">
+                                            {sourcePreview ? (
+                                                <img src={sourcePreview} alt="Source" />
+                                            ) : (
+                                                <span>A</span>
+                                            )}
+                                        </div>
+                                        <select value={source} onChange={handleSourceChange}>
+                                            {samples.map(s => (
+                                                <option key={s.name} value={s.name}>
+                                                    {s.name.replace('.pth', '')}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div className="blend-indicator">
+                                        <span>→</span>
+                                    </div>
+                                    <div className="identity-item">
+                                        <span className="source-label">Source B</span>
+                                        <div className="identity-avatar">
+                                            {targetPreview ? (
+                                                <img src={targetPreview} alt="Target" />
+                                            ) : (
+                                                <span>B</span>
+                                            )}
+                                        </div>
+                                        <select value={target} onChange={handleTargetChange}>
+                                            {samples.map(s => (
+                                                <option key={s.name} value={s.name}>
+                                                    {s.name.replace('.pth', '')}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
                                 </div>
-                            )}
-                            {isRendering && <div className="render-indicator">Rendering...</div>}
+                            </div>
+
+                            {/* Blend Controls */}
+                            <div className="sliders-panel">
+                                <div className="slider-group-header">
+                                    <span>✨ Blend Controls</span>
+                                    <span className="hint">0 = Source, 1 = Target</span>
+                                </div>
+                                <div className="sliders-grid">
+                                    {BLEND_SLIDERS.map(s => (
+                                        <div key={s.id} className="slider-compact">
+                                            <div className="slider-top">
+                                                <span>{s.icon} {s.label}</span>
+                                                <span className="slider-val">{sliderValues[s.id].toFixed(2)}</span>
+                                            </div>
+                                            <input
+                                                type="range"
+                                                min={0}
+                                                max={1}
+                                                step={0.01}
+                                                value={sliderValues[s.id]}
+                                                onChange={(e) => handleSliderChange(s.id, e.target.value)}
+                                                className="slider blend"
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* View Controls */}
+                            <div className="sliders-panel">
+                                <div className="slider-group-header">
+                                    <span>👁️ View Controls</span>
+                                </div>
+                                <div className="sliders-row">
+                                    {VIEW_SLIDERS.map(s => (
+                                        <div key={s.id} className="slider-compact">
+                                            <div className="slider-top">
+                                                <span>{s.icon} {s.label}</span>
+                                                <span className="slider-val">{sliderValues[s.id].toFixed(2)}</span>
+                                            </div>
+                                            <input
+                                                type="range"
+                                                min={s.min}
+                                                max={s.max}
+                                                step={0.01}
+                                                value={sliderValues[s.id]}
+                                                onChange={(e) => handleSliderChange(s.id, e.target.value)}
+                                                className="slider view"
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Reset Button */}
+                            <button className="reset-btn" onClick={handleReset}>
+                                ↺ Reset All
+                            </button>
                         </div>
                     </div>
 
-                    {/* Controls - Right Side */}
-                    <div className="controls-section">
-                        {/* Identity Selection - Compact */}
-                        <div className="identity-row">
-                            <div className="identity-item">
-                                <div className="identity-avatar">
-                                    {sourcePreview ? (
-                                        <img src={sourcePreview} alt="Source" />
-                                    ) : (
-                                        <span>A</span>
-                                    )}
-                                </div>
-                                <select value={source} onChange={handleSourceChange}>
-                                    {samples.map(s => (
-                                        <option key={s.name} value={s.name}>
-                                            {s.name.replace('.pth', '')}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="blend-indicator">
-                                <span>→ Blend →</span>
-                            </div>
-                            <div className="identity-item">
-                                <div className="identity-avatar">
-                                    {targetPreview ? (
-                                        <img src={targetPreview} alt="Target" />
-                                    ) : (
-                                        <span>B</span>
-                                    )}
-                                </div>
-                                <select value={target} onChange={handleTargetChange}>
-                                    {samples.map(s => (
-                                        <option key={s.name} value={s.name}>
-                                            {s.name.replace('.pth', '')}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
-
-                        {/* Blend Controls - Horizontal Layout */}
-                        <div className="sliders-panel">
-                            <div className="slider-group-header">
-                                <span>Blend Controls</span>
-                                <span className="hint">0 = Source, 1 = Target</span>
-                            </div>
-                            <div className="sliders-grid">
-                                {BLEND_SLIDERS.map(s => (
-                                    <div key={s.id} className="slider-compact">
-                                        <div className="slider-top">
-                                            <span>{s.icon} {s.label}</span>
-                                            <span className="slider-val">{sliderValues[s.id].toFixed(2)}</span>
-                                        </div>
-                                        <input
-                                            type="range"
-                                            min={0}
-                                            max={1}
-                                            step={0.01}
-                                            value={sliderValues[s.id]}
-                                            onChange={(e) => handleSliderChange(s.id, e.target.value)}
-                                            className="slider blend"
-                                        />
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* View Controls */}
-                        <div className="sliders-panel">
-                            <div className="slider-group-header">
-                                <span>View Controls</span>
-                            </div>
-                            <div className="sliders-row">
-                                {VIEW_SLIDERS.map(s => (
-                                    <div key={s.id} className="slider-compact">
-                                        <div className="slider-top">
-                                            <span>{s.icon} {s.label}</span>
-                                            <span className="slider-val">{sliderValues[s.id].toFixed(2)}</span>
-                                        </div>
-                                        <input
-                                            type="range"
-                                            min={s.min}
-                                            max={s.max}
-                                            step={0.01}
-                                            value={sliderValues[s.id]}
-                                            onChange={(e) => handleSliderChange(s.id, e.target.value)}
-                                            className="slider view"
-                                        />
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Reset */}
-                        <button className="reset-btn" onClick={handleReset}>
-                            ↺ Reset All
+                    {/* Action Buttons Row */}
+                    <div className="action-buttons-row">
+                        <button className="btn-export" onClick={handleExport} disabled={!outputImage}>
+                            📥 Export
+                        </button>
+                        <button className="btn-generate" onClick={doRender} disabled={isRendering}>
+                            {isRendering ? (
+                                <>
+                                    <span className="spinner"></span>
+                                    Generating...
+                                </>
+                            ) : (
+                                <>✨ Generate</>
+                            )}
                         </button>
                     </div>
-                </div>
+                </>
             ) : (
                 /* Fitting Tab */
                 <div className="fit-layout">
@@ -364,7 +399,7 @@ function HeadNeRFTool() {
                         <p>Upload a face photo to convert it into a HeadNeRF latent code.</p>
 
                         <div className="fit-grid">
-                            {/* Upload */}
+                            {/* Upload Area */}
                             <div
                                 className={`fit-drop ${fitPreview ? 'has-image' : ''}`}
                                 ref={dragRef}

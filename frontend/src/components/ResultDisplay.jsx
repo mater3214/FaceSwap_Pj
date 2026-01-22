@@ -1,3 +1,4 @@
+import { useEffect, useState, useMemo } from 'react';
 import './ResultDisplay.css';
 import { getResultImageUrl } from '../services/api';
 
@@ -12,8 +13,35 @@ function ResultDisplay({
 }) {
     // Handle single or multi source files
     const hasMultipleSources = isMultiMode && sourceFiles.length > 0;
-    const sourcePreview = sourceFile ? URL.createObjectURL(sourceFile) : null;
-    const targetPreview = targetFile ? URL.createObjectURL(targetFile) : null;
+
+    // Manage ObjectURLs with proper cleanup
+    const [sourcePreview, setSourcePreview] = useState(null);
+    const [targetPreview, setTargetPreview] = useState(null);
+    const [multiPreviews, setMultiPreviews] = useState([]);
+
+    // Cleanup and create source preview
+    useEffect(() => {
+        if (sourcePreview) URL.revokeObjectURL(sourcePreview);
+        const url = sourceFile ? URL.createObjectURL(sourceFile) : null;
+        setSourcePreview(url);
+        return () => { if (url) URL.revokeObjectURL(url); };
+    }, [sourceFile]);
+
+    // Cleanup and create target preview
+    useEffect(() => {
+        if (targetPreview) URL.revokeObjectURL(targetPreview);
+        const url = targetFile ? URL.createObjectURL(targetFile) : null;
+        setTargetPreview(url);
+        return () => { if (url) URL.revokeObjectURL(url); };
+    }, [targetFile]);
+
+    // Cleanup and create multi source previews
+    useEffect(() => {
+        multiPreviews.forEach(url => URL.revokeObjectURL(url));
+        const urls = sourceFiles.slice(0, 4).map(f => URL.createObjectURL(f));
+        setMultiPreviews(urls);
+        return () => { urls.forEach(url => URL.revokeObjectURL(url)); };
+    }, [sourceFiles]);
 
     // Handle both API URLs and blob URLs
     const resultImageUrl = resultUrl
@@ -59,10 +87,10 @@ function ResultDisplay({
                     <div className={`item-image ${hasMultipleSources ? 'multi-source' : ''}`}>
                         {hasMultipleSources ? (
                             <div className="multi-source-grid">
-                                {sourceFiles.slice(0, 4).map((file, index) => (
+                                {multiPreviews.map((previewUrl, index) => (
                                     <img
                                         key={index}
-                                        src={URL.createObjectURL(file)}
+                                        src={previewUrl}
                                         alt={`Source ${index + 1}`}
                                         className="multi-source-img"
                                     />

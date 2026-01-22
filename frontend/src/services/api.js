@@ -1,28 +1,7 @@
 // API Service for FaceLab
 const API_BASE_URL = 'http://localhost:8000';
 
-/**
- * Fetch all available regions
- */
-export async function getRegions() {
-  const response = await fetch(`${API_BASE_URL}/api/regions`);
-  if (!response.ok) {
-    throw new Error('Failed to fetch regions');
-  }
-  const data = await response.json();
-  return data.regions;
-}
-
-/**
- * Fetch a specific region by ID
- */
-export async function getRegionById(regionId) {
-  const response = await fetch(`${API_BASE_URL}/api/regions/${regionId}`);
-  if (!response.ok) {
-    throw new Error(`Region '${regionId}' not found`);
-  }
-  return response.json();
-}
+import { compressImage, compressImages } from '../utils/imageUtils';
 
 /**
  * Run SimSwap face swap (single face)
@@ -31,9 +10,15 @@ export async function getRegionById(regionId) {
  * @param {string} regionId - Selected region ID (optional, for future use)
  */
 export async function runSimSwap(srcFile, dstFile, regionId = null) {
+  // Compress images before upload
+  const [compressedSrc, compressedDst] = await Promise.all([
+    compressImage(srcFile),
+    compressImage(dstFile)
+  ]);
+
   const formData = new FormData();
-  formData.append('src', srcFile);
-  formData.append('dst', dstFile);
+  formData.append('src', compressedSrc);
+  formData.append('dst', compressedDst);
 
   const response = await fetch(`${API_BASE_URL}/api/simswap`, {
     method: 'POST',
@@ -54,11 +39,17 @@ export async function runSimSwap(srcFile, dstFile, regionId = null) {
  * @param {File} dstFile - Target/destination image
  */
 export async function runSimSwapMulti(srcFiles, dstFile) {
+  // Compress images before upload
+  const [compressedSrcFiles, compressedDst] = await Promise.all([
+    compressImages(srcFiles),
+    compressImage(dstFile)
+  ]);
+
   const formData = new FormData();
-  srcFiles.forEach(file => {
+  compressedSrcFiles.forEach(file => {
     formData.append('src', file);
   });
-  formData.append('dst', dstFile);
+  formData.append('dst', compressedDst);
 
   const response = await fetch(`${API_BASE_URL}/api/simswap_multi_upload`, {
     method: 'POST',

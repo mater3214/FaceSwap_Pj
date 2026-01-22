@@ -1,7 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
 import { runBackgroundRemoval, getResultImageUrl } from '../services/api';
 import './BackgroundRemovalTool.css';
-import '../pages/HeadNeRFTool.css';
 
 const PRESET_COLORS = [
     { rgb: '255,255,255', hex: '#ffffff', name: 'White' },
@@ -123,21 +122,19 @@ function BackgroundRemovalTool() {
 
     return (
         <div className="bgr-page">
-            {/* Header */}
+            {/* Header - Same style as HeadNeRF */}
             <header className="headnerf-header">
                 <h1>Background Removal</h1>
                 <p>Remove backgrounds instantly with advanced AI technology</p>
             </header>
 
-            {/* Main Content */}
+            {/* Main Container */}
             <div className="bgr-container">
                 {/* Two Column Layout */}
                 <div className="bgr-layout">
-                    {/* Left: Upload & Settings */}
+                    {/* Left: Upload Area with Grid Background */}
                     <div className="bgr-left">
-                        {/* Upload Area */}
                         <section className="upload-area">
-                            <h3 className="section-title">📷 Upload Image</h3>
                             <div
                                 className={`drop-zone ${imagePreview ? 'has-image' : ''}`}
                                 ref={dropRef}
@@ -161,7 +158,7 @@ function BackgroundRemovalTool() {
                                         <div className="drop-icon">📷</div>
                                         <h3>Drop your image here</h3>
                                         <p>or click to browse</p>
-                                        <span className="supported-formats">PNG, JPG, WEBP • Max 10MB</span>
+                                        <span className="supported-formats">PNG, JPG, WEBP up to 10MB</span>
                                     </div>
                                 )}
                                 <input
@@ -173,120 +170,9 @@ function BackgroundRemovalTool() {
                                 />
                             </div>
                         </section>
-
-                        {/* Mode Selection */}
-                        <section className="mode-section">
-                            <h3 className="section-title">🎯 Output Mode</h3>
-                            <div className="mode-grid">
-                                {MODES.map(m => (
-                                    <button
-                                        key={m.id}
-                                        className={`mode-card ${mode === m.id ? 'active' : ''}`}
-                                        onClick={() => setMode(m.id)}
-                                    >
-                                        <span className="mode-icon">{m.icon}</span>
-                                        <span className="mode-label">{m.label}</span>
-                                        <span className="mode-desc">{m.desc}</span>
-                                    </button>
-                                ))}
-                            </div>
-                        </section>
-
-                        {/* Color Options (for color mode) */}
-                        {mode === 'color' && (
-                            <section className="options-section">
-                                <h3 className="section-title">🎨 Background Color</h3>
-                                <div className="color-grid">
-                                    {PRESET_COLORS.map(c => (
-                                        <button
-                                            key={c.rgb}
-                                            className={`color-swatch ${selectedColors.includes(c.rgb) ? 'active' : ''}`}
-                                            style={{ backgroundColor: c.hex }}
-                                            onClick={() => selectColor(c.rgb)}
-                                            title={c.name}
-                                        />
-                                    ))}
-                                    <label className="color-picker-wrapper">
-                                        <input
-                                            type="color"
-                                            className="color-picker-input"
-                                            onChange={(e) => {
-                                                const hex = e.target.value;
-                                                const r = parseInt(hex.slice(1, 3), 16);
-                                                const g = parseInt(hex.slice(3, 5), 16);
-                                                const b = parseInt(hex.slice(5, 7), 16);
-                                                selectColor(`${r},${g},${b}`);
-                                            }}
-                                        />
-                                        <span className="picker-icon">+</span>
-                                    </label>
-                                </div>
-
-                                {/* Gradient Presets */}
-                                <div className="gradient-section">
-                                    <span className="gradient-label">Or try gradients:</span>
-                                    <div className="gradient-presets">
-                                        {GRADIENT_PRESETS.map(g => (
-                                            <button
-                                                key={g.name}
-                                                className="gradient-btn"
-                                                style={{
-                                                    background: `linear-gradient(135deg, ${g.colors[0]}, ${g.colors[1]})`
-                                                }}
-                                                title={g.name}
-                                            />
-                                        ))}
-                                    </div>
-                                </div>
-                            </section>
-                        )}
-
-                        {/* Custom BG Image (for image mode) */}
-                        {mode === 'image' && (
-                            <section className="options-section">
-                                <h3 className="section-title">🖼️ Custom Background</h3>
-                                <div
-                                    className={`drop-zone bg-drop ${bgImagePreview ? 'has-image' : ''}`}
-                                    ref={bgDropRef}
-                                    onDragOver={(e) => {
-                                        e.preventDefault();
-                                        bgDropRef.current?.classList.add('drag-over');
-                                    }}
-                                    onDragLeave={() => bgDropRef.current?.classList.remove('drag-over')}
-                                    onDrop={(e) => handleDrop(e, 'bg')}
-                                    onClick={() => document.getElementById('bg-input').click()}
-                                >
-                                    {bgImagePreview ? (
-                                        <img src={bgImagePreview} alt="Background" className="bg-preview" />
-                                    ) : (
-                                        <div className="drop-content small">
-                                            <span className="drop-icon">🖼️</span>
-                                            <span>Drop background image</span>
-                                        </div>
-                                    )}
-                                    <input
-                                        id="bg-input"
-                                        type="file"
-                                        accept="image/*"
-                                        onChange={handleBgImageChange}
-                                        hidden
-                                    />
-                                </div>
-                            </section>
-                        )}
-
-                        {/* Blur Info */}
-                        {mode === 'blur' && (
-                            <section className="options-section">
-                                <div className="info-card">
-                                    <span className="info-icon">💡</span>
-                                    <p>The original background will be blurred while keeping your subject sharp and in focus.</p>
-                                </div>
-                            </section>
-                        )}
                     </div>
 
-                    {/* Right: Results */}
+                    {/* Right: Result Panel */}
                     <div className="bgr-right">
                         <section className="result-section">
                             <h3 className="section-title">✨ Result</h3>
@@ -378,6 +264,139 @@ function BackgroundRemovalTool() {
                                 </div>
                             )}
                         </section>
+
+                        {/* Pro Tips */}
+                        <div className="pro-tips-panel">
+                            <div className="pro-tips-header">
+                                <span>💡</span> Pro Tips
+                            </div>
+                            <ul className="pro-tips-list">
+                                <li>Use high-resolution images for best results</li>
+                                <li>Clear contrast between subject and background helps</li>
+                                <li>Works best with portraits and product photos</li>
+                            </ul>
+                        </div>
+
+                        {/* Color Options (for color mode) - Inline */}
+                        {mode === 'color' && (
+                            <section className="options-section">
+                                <h3 className="section-title">🎨 Background Color</h3>
+                                <div className="color-grid">
+                                    {PRESET_COLORS.map(c => (
+                                        <button
+                                            key={c.rgb}
+                                            className={`color-swatch ${selectedColors.includes(c.rgb) ? 'active' : ''}`}
+                                            style={{ backgroundColor: c.hex }}
+                                            onClick={() => selectColor(c.rgb)}
+                                            title={c.name}
+                                        />
+                                    ))}
+                                    <label className="color-picker-wrapper">
+                                        <input
+                                            type="color"
+                                            className="color-picker-input"
+                                            onChange={(e) => {
+                                                const hex = e.target.value;
+                                                const r = parseInt(hex.slice(1, 3), 16);
+                                                const g = parseInt(hex.slice(3, 5), 16);
+                                                const b = parseInt(hex.slice(5, 7), 16);
+                                                selectColor(`${r},${g},${b}`);
+                                            }}
+                                        />
+                                        <span className="picker-icon">+</span>
+                                    </label>
+                                </div>
+
+                                {/* Gradient Presets */}
+                                <div className="gradient-section">
+                                    <span className="gradient-label">Or try gradients:</span>
+                                    <div className="gradient-presets">
+                                        {GRADIENT_PRESETS.map(g => {
+                                            // Convert first hex color to rgb
+                                            const hex = g.colors[0];
+                                            const r = parseInt(hex.slice(1, 3), 16);
+                                            const gVal = parseInt(hex.slice(3, 5), 16);
+                                            const b = parseInt(hex.slice(5, 7), 16);
+                                            return (
+                                                <button
+                                                    key={g.name}
+                                                    className="gradient-btn"
+                                                    style={{
+                                                        background: `linear-gradient(135deg, ${g.colors[0]}, ${g.colors[1]})`
+                                                    }}
+                                                    title={g.name}
+                                                    onClick={() => selectColor(`${r},${gVal},${b}`)}
+                                                />
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            </section>
+                        )}
+
+                        {/* Custom BG Image (for image mode) */}
+                        {mode === 'image' && (
+                            <section className="options-section">
+                                <h3 className="section-title">🖼️ Custom Background</h3>
+                                <div
+                                    className={`drop-zone bg-drop ${bgImagePreview ? 'has-image' : ''}`}
+                                    ref={bgDropRef}
+                                    onDragOver={(e) => {
+                                        e.preventDefault();
+                                        bgDropRef.current?.classList.add('drag-over');
+                                    }}
+                                    onDragLeave={() => bgDropRef.current?.classList.remove('drag-over')}
+                                    onDrop={(e) => handleDrop(e, 'bg')}
+                                    onClick={() => document.getElementById('bg-input').click()}
+                                >
+                                    {bgImagePreview ? (
+                                        <img src={bgImagePreview} alt="Background" className="bg-preview" />
+                                    ) : (
+                                        <div className="drop-content small">
+                                            <span className="drop-icon">🖼️</span>
+                                            <span>Drop background image</span>
+                                        </div>
+                                    )}
+                                    <input
+                                        id="bg-input"
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleBgImageChange}
+                                        hidden
+                                    />
+                                </div>
+                            </section>
+                        )}
+
+                        {/* Blur Info */}
+                        {mode === 'blur' && (
+                            <section className="options-section">
+                                <div className="info-card">
+                                    <span className="info-icon">💡</span>
+                                    <p>The original background will be blurred while keeping your subject sharp and in focus.</p>
+                                </div>
+                            </section>
+                        )}
+                    </div>
+                </div>
+
+                {/* Output Mode Bar - Bottom */}
+                <div className="output-mode-bar">
+                    <div className="output-mode-label">
+                        <span>📦</span> Output Mode
+                    </div>
+                    <div className="output-mode-cards">
+                        {MODES.map(m => (
+                            <button
+                                key={m.id}
+                                className={`output-mode-card ${mode === m.id ? 'active' : ''}`}
+                                onClick={() => setMode(m.id)}
+                            >
+                                <span className="output-mode-icon">{m.icon}</span>
+                                <span className="output-mode-name">{m.label}</span>
+                                <span className="output-mode-desc">{m.desc}</span>
+                            </button>
+                        ))}
                     </div>
                 </div>
             </div>
