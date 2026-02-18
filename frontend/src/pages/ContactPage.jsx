@@ -11,7 +11,7 @@ function ContactPage() {
 
                 <div className="contact-card">
                     <div className="contact-icon">
-                        📧
+                        Email
                     </div>
                     <h2>Email</h2>
                     <a href="mailto:contact@insightface.ai" className="contact-email">

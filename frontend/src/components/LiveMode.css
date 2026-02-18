@@ -1,0 +1,156 @@
+.live-mode-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: #f8f9fa;
+    /* White/Light Gray background */
+    color: #333;
+    /* Dark text */
+    font-family: 'Inter', sans-serif;
+}
+
+/* Header removed, styles deleted */
+
+.live-content {
+    display: flex;
+    flex: 1;
+    padding: 20px;
+    gap: 20px;
+    overflow: hidden;
+}
+
+.live-sidebar {
+    width: 300px;
+    background: #ffffff;
+    /* White sidebar */
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    border: 1px solid #e0e0e0;
+    /* Light border */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    /* Subtle shadow */
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.control-group label {
+    font-weight: 600;
+    color: #555;
+    /* Medium dark label */
+}
+
+.upload-btn {
+    background: #f0f2f5;
+    border: 2px dashed #ccc;
+    padding: 20px;
+    text-align: center;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #666;
+}
+
+.upload-btn:hover {
+    background: #e4e6eb;
+    border-color: #999;
+}
+
+.source-preview {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.action-btn {
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-start {
+    background: linear-gradient(45deg, #00b894, #00cec9);
+    /* Teal/Greenish gradient */
+    color: white;
+}
+
+.btn-stop {
+    background: linear-gradient(45deg, #ff7675, #d63031);
+    /* Red gradient */
+    color: white;
+}
+
+.action-btn:active {
+    transform: scale(0.98);
+}
+
+.action-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: #ccc;
+    color: #888;
+    box-shadow: none;
+}
+
+.live-main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #000;
+    /* Keep video area black for contrast */
+    border-radius: 12px;
+    position: relative;
+    border: 1px solid #e0e0e0;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.video-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Hide the raw webcam video but keep it in DOM for reading */
+.input-video {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 160px;
+    height: 120px;
+    border: 2px solid #fff;
+    border-radius: 8px;
+    z-index: 10;
+    background: #000;
+    transform: scaleX(-1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.output-canvas {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    transform: scaleX(-1);
+}
+
+/* Status indicator was in header, but user wanted header gone.
+   If we want to keep status, we need to move it or delete it.
+   The user said "remove header", implying the visual top bar.
+   I'll remove the CSS for it as it was inside the header. 
+   If we want status, we could float it over the video, but let's stick to removal for now or simple overlay. */

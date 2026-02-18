@@ -7,7 +7,7 @@ function ServicesPage() {
         {
             title: "SimSwap",
             description: "High-quality AI face swapping for images. Seamless identity transfer with state-of-the-art neural networks.",
-            icon: "🎭",
+            icon: "",
             link: "/tool/simswap-single",
             cta: "Try Now",
             color: "blue",
@@ -16,7 +16,7 @@ function ServicesPage() {
         {
             title: "HeadNeRF",
             description: "Neural Radiance Field for parametric 3D head generation. Real-time blending and pose control.",
-            icon: "🧠",
+            icon: "",
             link: "/tool/headnerf",
             cta: "Try Now",
             color: "purple",
@@ -25,11 +25,20 @@ function ServicesPage() {
         {
             title: "Background Removal",
             description: "AI-powered background removal with transparent, solid color, or custom image replacement options.",
-            icon: "✂️",
+            icon: "",
             link: "/tool/bg-removal",
             cta: "Try Now",
             color: "teal",
             features: ["Instant Remove", "Custom Backgrounds", "Batch Processing"]
+        },
+        {
+            title: "Live Deepfake",
+            description: "Real-time face swapping on live webcam feed. Stream with a new identity using AI-powered face filtering.",
+            icon: "",
+            link: "/tool/live",
+            cta: "Try Now",
+            color: "orange",
+            features: ["Real-time", "Webcam Support", "Face Filtering"]
         }
     ];
 

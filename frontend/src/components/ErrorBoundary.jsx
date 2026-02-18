@@ -31,7 +31,7 @@ class ErrorBoundary extends Component {
             return (
                 <div className="error-boundary">
                     <div className="error-content">
-                        <div className="error-icon">⚠️</div>
+                        <div className="error-icon">!</div>
                         <h1 className="error-title">เกิดข้อผิดพลาด</h1>
                         <p className="error-message">
                             ขออภัย เกิดข้อผิดพลาดบางอย่างขึ้น กรุณาลองใหม่อีกครั้ง
@@ -52,13 +52,13 @@ class ErrorBoundary extends Component {
                                 className="btn btn-secondary"
                                 onClick={this.handleReset}
                             >
-                                🔄 ลองอีกครั้ง
+                                Retry
                             </button>
                             <button
                                 className="btn btn-primary"
                                 onClick={this.handleReload}
                             >
-                                🔃 รีโหลดหน้า
+                                Reload Page
                             </button>
                         </div>
                     </div>

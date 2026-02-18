@@ -81,7 +81,7 @@ function ResultDisplay({
                 {/* Source */}
                 <div className="comparison-item">
                     <div className="item-label">
-                        <span className="label-icon">{hasMultipleSources ? '👥' : '👤'}</span>
+                        <span className="label-icon">{hasMultipleSources ? 'S' : 'S'}</span>
                         {hasMultipleSources ? 'รูปอ้างอิง (Sources)' : 'รูปอ้างอิง (Source)'}
                     </div>
                     <div className={`item-image ${hasMultipleSources ? 'multi-source' : ''}`}>
@@ -113,7 +113,7 @@ function ResultDisplay({
                 {/* Target */}
                 <div className="comparison-item">
                     <div className="item-label">
-                        <span className="label-icon">🎯</span>
+                        <span className="label-icon">T</span>
                         รูปเป้าหมาย (Target)
                     </div>
                     <div className="item-image">
@@ -127,7 +127,7 @@ function ResultDisplay({
                 {/* Result */}
                 <div className="comparison-item result">
                     <div className="item-label">
-                        <span className="label-icon">✨</span>
+                        <span className="label-icon">R</span>
                         ผลลัพธ์
                     </div>
                     <div className="item-image result-image">
@@ -143,13 +143,13 @@ function ResultDisplay({
 
             <div className="result-actions">
                 <button className="btn btn-secondary" onClick={onReset}>
-                    <span>🔄</span> เริ่มใหม่
+                    <span></span> Reset
                 </button>
                 <button className="btn btn-primary" onClick={onProceedToEdit}>
-                    <span>🎨</span> ปรับแต่งสี
+                    <span></span> Color Edit
                 </button>
                 <button className="btn btn-secondary" onClick={handleDownload}>
-                    <span>⬇️</span> ดาวน์โหลด
+                    <span></span> Download
                 </button>
             </div>
         </div>

@@ -5,6 +5,7 @@ import GenerationProgress from '../components/GenerationProgress';
 import ResultDisplay from '../components/ResultDisplay';
 import ColorEditor from '../components/ColorEditor';
 import FaceMapper from '../components/FaceMapper';
+import ResultPicker from '../components/ResultPicker';
 import { runSimSwap, runSimSwapMultiWithMapping, getResultImageUrl } from '../services/api';
 import './FaceSwapTool.css';
 import './HeadNeRFTool.css';
@@ -31,9 +32,21 @@ function FaceSwapTool() {
     // Tool selection
     const [selectedTool, setSelectedTool] = useState(getToolFromPath);
 
-    // Update tool when route changes
+    // Update tool AND reset state when route changes (switching tools)
     useEffect(() => {
-        setSelectedTool(getToolFromPath());
+        const newTool = getToolFromPath();
+        if (newTool !== selectedTool) {
+            setSelectedTool(newTool);
+            // Full reset so user starts fresh on new tool
+            setSourceFile(null);
+            setSourceFiles([]);
+            setTargetFile(null);
+            setResultUrl(null);
+            setError(null);
+            setProgress(0);
+            setFaceMapping(null);
+            setCurrentState(STATES.UPLOAD);
+        }
     }, [location.pathname]);
 
     // App state
@@ -52,6 +65,10 @@ function FaceSwapTool() {
     const [error, setError] = useState(null);
     const [faceMapping, setFaceMapping] = useState(null);  // Face mapping for multi mode
 
+    // Result Picker
+    const [pickerOpen, setPickerOpen] = useState(false);
+    const [pickerTarget, setPickerTarget] = useState('source'); // 'source' or 'target'
+
     // Handlers
     const handleToolChange = (toolId) => {
         setSelectedTool(toolId);
@@ -68,8 +85,13 @@ function FaceSwapTool() {
     }, []);
 
     const handleSourceFilesChange = useCallback((files) => {
-        setSourceFiles(files);
+        // Append new files to existing list instead of replacing
+        setSourceFiles(prev => [...prev, ...files]);
         setError(null);
+    }, []);
+
+    const removeSourceFile = useCallback((index) => {
+        setSourceFiles(prev => prev.filter((_, i) => i !== index));
     }, []);
 
     const handleTargetChange = useCallback((file) => {
@@ -218,7 +240,7 @@ function FaceSwapTool() {
                 {/* Error Display */}
                 {error && (
                     <div className="error-banner">
-                        <span className="error-icon">⚠️</span>
+                        <span className="error-icon">!</span>
                         <span>{error}</span>
                         <button className="close-btn" onClick={() => setError(null)}>×</button>
                     </div>
@@ -237,6 +259,75 @@ function FaceSwapTool() {
                             isMultiMode={isMultiMode}
                         />
 
+                        {/* Use Previous Results */}
+                        <div style={{ display: 'flex', gap: '8px', marginTop: '10px', justifyContent: 'center' }}>
+                            <button
+                                className="btn btn-secondary"
+                                onClick={() => { setPickerTarget('source'); setPickerOpen(true); }}
+                                style={{ fontSize: '0.85rem' }}
+                            >
+                                Use Result as Source
+                            </button>
+                            <button
+                                className="btn btn-secondary"
+                                onClick={() => { setPickerTarget('target'); setPickerOpen(true); }}
+                                style={{ fontSize: '0.85rem' }}
+                            >
+                                Use Result as Target
+                            </button>
+                        </div>
+
+                        {/* Source Queue — shows accumulated files for multi mode */}
+                        {isMultiMode && sourceFiles.length > 0 && (
+                            <div className="source-queue">
+                                <div className="source-queue-header">
+                                    <span className="source-queue-title">Source Files ({sourceFiles.length})</span>
+                                    <button
+                                        className="btn btn-ghost"
+                                        style={{ fontSize: '0.75rem', padding: '2px 8px' }}
+                                        onClick={() => setSourceFiles([])}
+                                    >
+                                        Clear All
+                                    </button>
+                                </div>
+                                <div className="source-queue-grid">
+                                    {sourceFiles.map((f, i) => (
+                                        <div key={i} className="source-queue-item">
+                                            <img src={URL.createObjectURL(f)} alt={`Source ${i + 1}`} />
+                                            <button
+                                                className="source-queue-remove"
+                                                onClick={() => removeSourceFile(i)}
+                                                title="Remove"
+                                            >
+                                                x
+                                            </button>
+                                            <span className="source-queue-label">{i + 1}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        <ResultPicker
+                            isOpen={pickerOpen}
+                            onClose={() => setPickerOpen(false)}
+                            multiSelect={isMultiMode && pickerTarget === 'source'}
+                            onSelect={(file, previewUrl) => {
+                                if (pickerTarget === 'source') {
+                                    if (isMultiMode) {
+                                        handleSourceFilesChange([file]);
+                                    } else {
+                                        handleSourceChange(file);
+                                    }
+                                } else {
+                                    handleTargetChange(file);
+                                }
+                            }}
+                            onMultiSelect={(files) => {
+                                handleSourceFilesChange(files);
+                            }}
+                        />
+
                         <div className="section-actions">
                             {isMultiMode ? (
                                 <button
@@ -244,7 +335,7 @@ function FaceSwapTool() {
                                     disabled={!canGenerate}
                                     onClick={handleProceedToMapping}
                                 >
-                                    🎯 ตั้งค่า Face Mapping
+                                    Start Face Mapping
                                 </button>
                             ) : (
                                 <button
@@ -252,7 +343,7 @@ function FaceSwapTool() {
                                     disabled={!canGenerate}
                                     onClick={handleGenerate}
                                 >
-                                    🚀 เริ่มสร้างภาพ
+                                    Generate
                                 </button>
                             )}
                         </div>

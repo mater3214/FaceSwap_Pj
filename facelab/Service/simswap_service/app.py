@@ -65,7 +65,7 @@ def run(src: UploadFile = File(...), dst: UploadFile = File(...)):
     dst_path = UPLOAD / f"{job}_dst.png"
     save_upload(src, src_path)
     save_upload(dst, dst_path)
-    arc_path = str(SIMSWAP_ROOT / "arcface_model" / "arcface_checkpoint.tar")
+    arc_path = r"C:\Users\painh\Desktop\CS FINALPROJECT\facelab\Service\simswap_service\SimSwap\arcface_model\arcface_checkpoint.tar"
 
     try:
         run_swap(str(src_path), str(dst_path), str(OUTPUT), crop_size=224, arc_path=arc_path)
@@ -109,7 +109,8 @@ def run_multi(src: List[UploadFile] = File(...), dst: UploadFile = File(...), ma
         src_paths.append(str(p))
     dst_path = UPLOAD / f"{job}_dst.png"
     save_upload(dst, dst_path)
-    arc_path = str(SIMSWAP_ROOT / "arcface_model" / "arcface_checkpoint.tar")
+    save_upload(dst, dst_path)
+    arc_path = r"C:\Users\painh\Desktop\CS FINALPROJECT\facelab\Service\simswap_service\SimSwap\arcface_model\arcface_checkpoint.tar"
 
     try:
         # pass multiple source paths joined with ';' — test_wholeimage_swapmulti supports this

@@ -25,8 +25,8 @@
 /* Upload Zone - Clean Modern Cards */
 .upload-zone {
     position: relative;
-    width: 220px;
-    height: 250px;
+    width: 240px;
+    height: 320px;
     border: 2px dashed transparent;
     border-radius: 16px;
     background: white;
@@ -131,6 +131,134 @@
     backdrop-filter: blur(4px);
 }
 
+/* Preview */
+.preview-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    /* Dark background for photos */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.preview-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    /* Show full image without cropping/squeezing */
+    display: block;
+}
+
+.preview-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    opacity: 0;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(2px);
+}
+
+.preview-container:hover .preview-overlay {
+    opacity: 1;
+}
+
+.preview-filename {
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding: 0.35rem 0.85rem;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 20px;
+    backdrop-filter: blur(4px);
+    max-width: 90%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.upload-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    width: 100%;
+    margin-top: 0.75rem;
+    padding: 0 1.2rem;
+}
+
+.btn-upload-trigger,
+.btn-camera-trigger {
+    width: 100%;
+    padding: 0.6rem 1rem;
+    border-radius: 12px;
+    border: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    letter-spacing: 0.3px;
+}
+
+/* Upload Button - Primary Style */
+.btn-upload-trigger {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
+}
+
+.btn-upload-trigger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(139, 92, 246, 0.35);
+}
+
+.btn-upload-trigger:active {
+    transform: translateY(0);
+}
+
+/* Camera Button - Secondary Style */
+.btn-camera-trigger {
+    background: #ffffff;
+    border: 2px solid #f3f4f6;
+    color: #4b5563;
+}
+
+.btn-camera-trigger:hover {
+    border-color: #d1d5db;
+    background: #f9fafb;
+    color: #111827;
+    transform: translateY(-2px);
+}
+
+.or-divider {
+    font-size: 0.7rem;
+    color: var(--text-tertiary);
+}
+
+.preview-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-camera-small {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.btn-camera-small:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
 /* Arrow Connector - Clean Minimal */
 .arrow-connector {
     display: flex;
@@ -160,36 +288,7 @@
 }
 
 /* Preview */
-.preview-container {
-    position: relative;
-    width: 100%;
-    height: 100%;
-}
-
-.preview-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
-
-.preview-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.5) 100%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 1rem;
-    opacity: 0;
-    transition: opacity 0.25s ease;
-    backdrop-filter: blur(2px);
-}
-
-.preview-container:hover .preview-overlay {
-    opacity: 1;
-}
+/* Old preview styles removed/superseded by above block */
 
 .preview-filename {
     color: white;

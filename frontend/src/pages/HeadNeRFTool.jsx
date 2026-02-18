@@ -10,16 +10,16 @@ import {
 import './HeadNeRFTool.css';
 
 const BLEND_SLIDERS = [
-    { id: 'identity', label: 'Identity', icon: '👤' },
-    { id: 'expression', label: 'Expression', icon: '😊' },
-    { id: 'albedo', label: 'Albedo', icon: '🎨' },
-    { id: 'illumination', label: 'Light', icon: '💡' },
+    { id: 'identity', label: 'Identity', icon: '' },
+    { id: 'expression', label: 'Expression', icon: '' },
+    { id: 'albedo', label: 'Albedo', icon: '' },
+    { id: 'illumination', label: 'Light', icon: '' },
 ];
 
 const VIEW_SLIDERS = [
-    { id: 'pitch', label: 'Pitch', icon: '↕️', min: -1, max: 1 },
-    { id: 'yaw', label: 'Yaw', icon: '↔️', min: -1, max: 1 },
-    { id: 'roll', label: 'Roll', icon: '🔄', min: -1, max: 1 },
+    { id: 'pitch', label: 'Pitch', icon: '', min: -1, max: 1 },
+    { id: 'yaw', label: 'Yaw', icon: '', min: -1, max: 1 },
+    { id: 'roll', label: 'Roll', icon: '', min: -1, max: 1 },
 ];
 
 const DEBOUNCE_MS = 100;
@@ -207,7 +207,7 @@ function HeadNeRFTool() {
         return (
             <div className="headnerf-page">
                 <div className="headnerf-error">
-                    <div className="error-icon">⚠️</div>
+                    <div className="error-icon">!</div>
                     <h2>Service Unavailable</h2>
                     <p>{error}</p>
                     <button className="btn-primary" onClick={initHeadNeRF}>
@@ -232,13 +232,13 @@ function HeadNeRFTool() {
                     className={`tab-item ${activeTab === 'blend' ? 'active' : ''}`}
                     onClick={() => setActiveTab('blend')}
                 >
-                    <span>⚙️</span> Blending
+                    <span></span> Blending
                 </button>
                 <button
                     className={`tab-item ${activeTab === 'fit' ? 'active' : ''}`}
                     onClick={() => setActiveTab('fit')}
                 >
-                    <span>📷</span> Fitting
+                    <span></span> Fitting
                 </button>
             </div>
 
@@ -258,7 +258,7 @@ function HeadNeRFTool() {
                                     <img src={outputImage} alt="Rendered" />
                                 ) : (
                                     <div className="output-placeholder">
-                                        <span>🖼️</span>
+                                        <span></span>
                                         <p>Output will appear here</p>
                                     </div>
                                 )}
@@ -271,7 +271,7 @@ function HeadNeRFTool() {
                             {/* Source Selection */}
                             <div className="sliders-panel">
                                 <div className="slider-group-header">
-                                    <span>📍 Source Selection</span>
+                                    <span>Source Selection</span>
                                 </div>
                                 <div className="identity-row">
                                     <div className="identity-item">
@@ -317,7 +317,7 @@ function HeadNeRFTool() {
                             {/* Blend Controls */}
                             <div className="sliders-panel">
                                 <div className="slider-group-header">
-                                    <span>✨ Blend Controls</span>
+                                    <span>Blend Controls</span>
                                     <span className="hint">0 = Source, 1 = Target</span>
                                 </div>
                                 <div className="sliders-grid">
@@ -344,7 +344,7 @@ function HeadNeRFTool() {
                             {/* View Controls */}
                             <div className="sliders-panel">
                                 <div className="slider-group-header">
-                                    <span>👁️ View Controls</span>
+                                    <span>View Controls</span>
                                 </div>
                                 <div className="sliders-row">
                                     {VIEW_SLIDERS.map(s => (
@@ -377,7 +377,7 @@ function HeadNeRFTool() {
                     {/* Action Buttons Row */}
                     <div className="action-buttons-row">
                         <button className="btn-export" onClick={handleExport} disabled={!outputImage}>
-                            📥 Export
+                            Export
                         </button>
                         <button className="btn-generate" onClick={doRender} disabled={isRendering}>
                             {isRendering ? (
@@ -386,7 +386,7 @@ function HeadNeRFTool() {
                                     Generating...
                                 </>
                             ) : (
-                                <>✨ Generate</>
+                                <>Generate</>
                             )}
                         </button>
                     </div>
@@ -415,7 +415,7 @@ function HeadNeRFTool() {
                                     <img src={fitPreview} alt="Upload" />
                                 ) : (
                                     <>
-                                        <span className="fit-icon">📷</span>
+                                        <span className="fit-icon"></span>
                                         <span>Drop image here</span>
                                     </>
                                 )}
@@ -455,7 +455,7 @@ function HeadNeRFTool() {
                                     Processing...
                                 </>
                             ) : (
-                                <>🚀 Start Fitting</>
+                                <>Start Fitting</>
                             )}
                         </button>
 

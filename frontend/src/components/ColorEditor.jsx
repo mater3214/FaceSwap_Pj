@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { getResultImageUrl } from '../services/api';
+import { getResultImageUrl, saveEditedResult } from '../services/api';
 import './ColorEditor.css';
 
 function ColorEditor({
@@ -11,6 +11,8 @@ function ColorEditor({
     const canvasRef = useRef(null);
     const originalImageRef = useRef(null);
     const [imageLoaded, setImageLoaded] = useState(false);
+    const [saving, setSaving] = useState(false);
+    const [saved, setSaved] = useState(false);
 
     // Color adjustment values
     const [adjustments, setAdjustments] = useState({
@@ -129,11 +131,28 @@ function ColorEditor({
         link.click();
     };
 
+    const handleSaveForReuse = async () => {
+        if (!canvasRef.current || saving) return;
+        setSaving(true);
+        try {
+            const canvas = canvasRef.current;
+            const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+            await saveEditedResult(blob, 'simswap');
+            setSaved(true);
+            setTimeout(() => setSaved(false), 3000);
+        } catch (err) {
+            console.error('Save failed:', err);
+            alert('บันทึกไม่สำเร็จ');
+        } finally {
+            setSaving(false);
+        }
+    };
+
     const sliders = [
-        { name: 'brightness', label: 'ความสว่าง', icon: '☀️', min: 0, max: 200, default: 100 },
-        { name: 'contrast', label: 'ความคมชัด', icon: '◐', min: 0, max: 200, default: 100 },
-        { name: 'saturation', label: 'ความอิ่มตัว', icon: '🎨', min: 0, max: 200, default: 100 },
-        { name: 'temperature', label: 'อุณหภูมิสี', icon: '🌡️', min: -50, max: 50, default: 0 },
+        { name: 'brightness', label: 'Brightness', icon: '', min: 0, max: 200, default: 100 },
+        { name: 'contrast', label: 'ความคมชัด', icon: '', min: 0, max: 200, default: 100 },
+        { name: 'saturation', label: 'Saturation', icon: '', min: 0, max: 200, default: 100 },
+        { name: 'temperature', label: 'Temperature', icon: '', min: -50, max: 50, default: 0 },
     ];
 
     return (
@@ -192,7 +211,7 @@ function ColorEditor({
                         ))}
 
                         <button className="btn btn-ghost reset-btn" onClick={handleReset}>
-                            🔄 รีเซ็ตค่า
+                            Reset
                         </button>
                     </div>
 
@@ -208,7 +227,7 @@ function ColorEditor({
                                     saturation: 110
                                 }))}
                             >
-                                ☀️ โทนร้อน
+                                Warm Tone
                             </button>
                             <button
                                 className="preset-btn cool"
@@ -218,7 +237,7 @@ function ColorEditor({
                                     saturation: 90
                                 }))}
                             >
-                                ❄️ โทนเย็น
+                                Cool Tone
                             </button>
                             <button
                                 className="preset-btn neutral"
@@ -228,7 +247,7 @@ function ColorEditor({
                                     saturation: 100
                                 }))}
                             >
-                                ⚖️ โทนกลาง
+                                Neutral
                             </button>
                             <button
                                 className="preset-btn vivid"
@@ -238,7 +257,7 @@ function ColorEditor({
                                     contrast: 110
                                 }))}
                             >
-                                🌈 สดใส
+                                Vivid
                             </button>
                         </div>
                     </div>
@@ -249,8 +268,15 @@ function ColorEditor({
                 <button className="btn btn-secondary" onClick={onBack}>
                     ← กลับ
                 </button>
+                <button
+                    className={`btn ${saved ? 'btn-success' : 'btn-secondary'}`}
+                    onClick={handleSaveForReuse}
+                    disabled={saving || !imageLoaded}
+                >
+                    {saving ? 'Saving...' : saved ? 'Saved!' : 'Save for Reuse'}
+                </button>
                 <button className="btn btn-primary" onClick={handleDownload}>
-                    ⬇️ ดาวน์โหลดผลลัพธ์
+                    Download Result
                 </button>
             </div>
         </div>

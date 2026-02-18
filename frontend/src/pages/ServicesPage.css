@@ -422,6 +422,11 @@
     box-shadow: 0 8px 32px rgba(45, 212, 191, 0.3);
 }
 
+.service-card.orange .icon-ring {
+    background: linear-gradient(135deg, #ffedd5, #fed7aa);
+    box-shadow: 0 8px 32px rgba(249, 115, 22, 0.3);
+}
+
 .service-card:hover .icon-ring {
     transform: scale(1.1);
 }
@@ -488,6 +493,10 @@
 
 .service-card.teal .service-link {
     background: linear-gradient(135deg, #14b8a6, #0d9488);
+}
+
+.service-card.orange .service-link {
+    background: linear-gradient(135deg, #f97316, #ea580c);
 }
 
 .service-link:hover {

@@ -62,13 +62,13 @@ function FaceMapper({
     return (
         <div className="face-mapper">
             <div className="mapper-header">
-                <h2>🎯 Face Mapping</h2>
+                <h2>Face Mapping</h2>
                 <p>เลือกว่าจะสลับใบหน้าไหนไปใส่ใบหน้าไหน</p>
             </div>
 
             {error && (
                 <div className="mapper-error">
-                    <span>⚠️</span> {error}
+                    <span>!</span> {error}
                 </div>
             )}
 
@@ -81,7 +81,7 @@ function FaceMapper({
                 <div className="mapping-content">
                     {/* Source Faces */}
                     <div className="faces-section sources">
-                        <h3>📤 Source Faces ({sourceFiles.length})</h3>
+                        <h3>Source Faces ({sourceFiles.length})</h3>
                         <div className="faces-grid">
                             {sourcePreviewsURLs.map((url, idx) => (
                                 <div key={idx} className="face-item source-face">
@@ -97,7 +97,7 @@ function FaceMapper({
 
                     {/* Target Faces */}
                     <div className="faces-section targets">
-                        <h3>📥 Target Faces ({targetFaces.length})</h3>
+                        <h3>Target Faces ({targetFaces.length})</h3>
                         {targetFaces.length === 0 ? (
                             <p className="no-faces">ไม่พบใบหน้าในรูปเป้าหมาย</p>
                         ) : (

@@ -180,7 +180,7 @@ function Home() {
                         <h2>
                             {selectedTool === 'simswap-single' && 'SimSwap (Single Face)'}
                             {selectedTool === 'simswap-multi' && 'SimSwap (Multi Face)'}
-                            {selectedTool === 'difareli' && 'DiFaReLi (Relighting)'}
+
                         </h2>
                     </div>
 
@@ -214,7 +214,7 @@ function Home() {
                     {/* Error Display */}
                     {error && (
                         <div className="error-banner">
-                            <span className="error-icon">⚠️</span>
+                            <span className="error-icon">!</span>
                             <span>{error}</span>
                             <button className="close-btn" onClick={() => setError(null)}>×</button>
                         </div>
@@ -239,7 +239,7 @@ function Home() {
                                     disabled={!canGenerate}
                                     onClick={handleGenerate}
                                 >
-                                    🚀 เริ่มสร้างภาพ
+                                    Start
                                 </button>
                             </div>
                         </div>

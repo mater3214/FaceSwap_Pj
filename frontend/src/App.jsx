@@ -9,6 +9,7 @@ import HeadNeRFTool from './pages/HeadNeRFTool';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import ResearchPage from './pages/ResearchPage';
+import LiveMode from './components/LiveMode';
 import './App.css';
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
                         <Route path="tool/*" element={<FaceSwapTool />} />
                         <Route path="tool/bg-removal" element={<BackgroundRemovalTool />} />
                         <Route path="tool/headnerf" element={<HeadNeRFTool />} />
+                        <Route path="tool/live" element={<LiveMode />} />
                     </Route>
                 </Routes>
             </BrowserRouter>
@@ -33,4 +35,3 @@ function App() {
 }
 
 export default App;
-

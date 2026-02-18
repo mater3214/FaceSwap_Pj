@@ -11,7 +11,7 @@ function ThemeToggle() {
             title={theme === 'light' ? 'เปลี่ยนเป็น Dark Mode' : 'เปลี่ยนเป็น Light Mode'}
         >
             <span className="theme-icon">
-                {theme === 'light' ? '🌙' : '☀️'}
+                {theme === 'light' ? 'Dark' : 'Light'}
             </span>
         </button>
     );

@@ -270,3 +270,68 @@ export async function fitHeadNeRF(imageFile) {
 
   return response.json();
 }
+
+// =============================================
+// RESULTS API (Cross-Tool Reuse)
+// =============================================
+
+/**
+ * Get list of recent result images from all tools
+ * @returns {{ results: Array<{ filename, tool, toolLabel, url, timestamp, size }> }}
+ */
+export async function getRecentResults() {
+  const response = await fetch(`${API_BASE_URL}/api/results`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch results');
+  }
+  return response.json();
+}
+
+/**
+ * Delete a specific result file
+ * @param {string} tool - Tool folder name (simswap, background_removal, headnerf)
+ * @param {string} filename - File name to delete
+ */
+export async function deleteResult(tool, filename) {
+  const response = await fetch(`${API_BASE_URL}/api/results/${tool}/${filename}`, {
+    method: 'DELETE',
+  });
+  if (!response.ok) {
+    throw new Error('Failed to delete result');
+  }
+  return response.json();
+}
+
+/**
+ * Convert a result URL to a File object for use as upload input
+ * @param {string} url - Result image URL (relative or absolute)
+ * @param {string} filename - Desired filename
+ * @returns {File}
+ */
+export async function resultUrlToFile(url, filename = 'result.png') {
+  const fullUrl = url.startsWith('http') ? url : `${API_BASE_URL}${url}`;
+  const response = await fetch(fullUrl);
+  const blob = await response.blob();
+  return new File([blob], filename, { type: blob.type });
+}
+
+/**
+ * Save an edited image (from canvas) back to shared results for cross-tool reuse
+ * @param {Blob} blob - Image blob (e.g. from canvas.toBlob)
+ * @param {string} tool - Tool name (simswap, background_removal, headnerf)
+ * @returns {{ ok, filename, url }}
+ */
+export async function saveEditedResult(blob, tool = 'simswap') {
+  const formData = new FormData();
+  formData.append('image', blob, 'edited.png');
+  formData.append('tool', tool);
+
+  const response = await fetch(`${API_BASE_URL}/api/results/save`, {
+    method: 'POST',
+    body: formData,
+  });
+  if (!response.ok) {
+    throw new Error('Failed to save edited result');
+  }
+  return response.json();
+}

@@ -4,7 +4,7 @@ import './ResearchPage.css';
 function ResearchPage() {
 
     // ===========================================
-    // 📝 MY PAPERS - เปเปอร์ของคุณ (แก้ไขตรงนี้!)
+    // MY PAPERS (edit here!)
     // ===========================================
     const myPapers = [
         {
@@ -23,7 +23,7 @@ function ResearchPage() {
     ];
 
     // ===========================================
-    // 📚 RELATED PAPERS - เปเปอร์ที่เกี่ยวข้อง
+    // RELATED PAPERS
     // ===========================================
     const relatedPapers = [
         {
@@ -45,14 +45,22 @@ function ResearchPage() {
             github: "https://github.com/CrisHY1995/headnerf"
         },
         {
-            title: "DiFaReli: Diffusion Face Relighting",
-            authors: "Puntawat Ponglertnapakorn, Nontawat Charoenphakdee, et al.",
-            venue: "ICCV 2023",
+            title: "YOLOv8: Real-Time Object Detection",
+            authors: "Ultralytics",
+            venue: "State-of-the-Art Object Detection",
             year: "2023",
-            tags: ["Diffusion", "Relighting"],
-            arxiv: "https://arxiv.org/abs/2304.09479",
-            github: "https://github.com/diffusion-face-relighting/difareli_code"
+            tags: ["Object Detection", "YOLO"],
+            website: "https://yolov8.com/",
+            github: "https://github.com/ultralytics/ultralytics"
         },
+        {
+            title: "Rembg: Background Removal Tool",
+            authors: "Daniel Gatis",
+            venue: "Open Source Tool",
+            year: "2020",
+            tags: ["Background Removal", "U2Net"],
+            github: "https://github.com/danielgatis/rembg"
+        }
     ];
 
 
@@ -67,7 +75,7 @@ function ResearchPage() {
                     <section className="papers-section featured-section">
                         <div className="section-header">
                             <div className="section-icon-wrapper">
-                                <span className="section-icon">📄</span>
+                                <span className="section-icon"></span>
                             </div>
                             <div>
                                 <h2>My Publications</h2>
@@ -88,7 +96,7 @@ function ResearchPage() {
                     <section className="papers-section">
                         <div className="section-header">
                             <div className="section-icon-wrapper purple">
-                                <span className="section-icon">📚</span>
+                                <span className="section-icon"></span>
                             </div>
                             <div>
                                 <h2>Related Research</h2>
@@ -169,6 +177,12 @@ function PaperCard({ paper, featured = false }) {
                         <a href={paper.demo} target="_blank" rel="noopener noreferrer" className="paper-link demo">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="5 3 19 12 5 21 5 3" /></svg>
                             Demo
+                        </a>
+                    )}
+                    {paper.website && (
+                        <a href={paper.website} target="_blank" rel="noopener noreferrer" className="paper-link website">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><line x1="2" y1="12" x2="22" y2="12" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /></svg>
+                            Website
                         </a>
                     )}
                 </div>

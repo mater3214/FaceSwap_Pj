@@ -20,7 +20,7 @@ function LandingPage() {
                         </p>
                         <div className="hero-actions">
                             <Link to="/services" className="btn btn-primary btn-xl">
-                                Get Started 🚀
+                                Get Started
                             </Link>
                             <Link to="/contact" className="btn btn-secondary btn-xl">
                                 Contact

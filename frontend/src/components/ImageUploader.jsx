@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
+import CameraCapture from './CameraCapture';
 import './ImageUploader.css';
 
 function ImageUploader({
@@ -12,6 +13,8 @@ function ImageUploader({
 }) {
     const [dragOver, setDragOver] = useState({ source: false, target: false });
     const [previewUrls, setPreviewUrls] = useState({ source: null, target: null, multi: [] });
+    const [showCamera, setShowCamera] = useState({ active: false, type: null, isMulti: false }); // Camera state
+
     const sourceInputRef = useRef(null);
     const targetInputRef = useRef(null);
 
@@ -98,7 +101,37 @@ function ImageUploader({
                 onChange(file);
             }
         }
+        // Reset input so same file can be re-selected
+        if (e.target) e.target.value = '';
     }, []);
+
+    // Camera Handlers
+    const openCamera = (type, isMulti = false) => {
+        setShowCamera({ active: true, type, isMulti });
+    };
+
+    const closeCamera = () => {
+        setShowCamera({ active: false, type: null, isMulti: false });
+    };
+
+    const handleCameraCapture = (file) => {
+        const { type, isMulti } = showCamera;
+
+        if (type === 'source') {
+            if (isMulti) {
+                // Determine existing files to append to? Or replace? 
+                // Usually appending is better for multi.
+                // But for simplicity let's just append this one file to existing list
+                onSourceFilesChange([...sourceFiles, file]);
+            } else {
+                onSourceChange(file);
+            }
+        } else if (type === 'target') {
+            onTargetChange(file);
+        }
+
+        closeCamera();
+    };
 
     // Get preview URL from state instead of creating new ones
     const getPreviewUrl = (type, index = 0) => {
@@ -127,7 +160,6 @@ function ImageUploader({
                 onDragOver={(e) => handleDragOver(e, type)}
                 onDragLeave={(e) => handleDragLeave(e, type)}
                 onDrop={(e) => handleDrop(e, type, onChange, isMulti)}
-                onClick={() => inputRef.current?.click()}
             >
                 <input
                     ref={inputRef}
@@ -165,15 +197,26 @@ function ImageUploader({
                             <span className="preview-filename">
                                 {isMulti ? `${files.length} ไฟล์` : file.name}
                             </span>
-                            <button
-                                className="btn-change"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    inputRef.current?.click();
-                                }}
-                            >
-                                เปลี่ยนรูป
-                            </button>
+                            <div className="preview-actions">
+                                <button
+                                    className="btn-change"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        inputRef.current?.click();
+                                    }}
+                                >
+                                    อัพโหลดใหม่
+                                </button>
+                                <button
+                                    className="btn-change btn-camera-small"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        openCamera(type, isMulti);
+                                    }}
+                                >
+                                    Retake
+                                </button>
+                            </div>
                         </div>
                     </div>
                 ) : (
@@ -181,9 +224,25 @@ function ImageUploader({
                         <div className="upload-icon">{icon}</div>
                         <h3 className="upload-title">{title}</h3>
                         <p className="upload-description">{description}</p>
-                        <span className="upload-hint">
-                            ลากไฟล์มาวาง หรือคลิกเพื่อเลือก
-                        </span>
+
+                        <div className="upload-buttons">
+                            <button
+                                className="btn-upload-trigger"
+                                onClick={() => inputRef.current?.click()}
+                            >
+                                เลือกรูปภาพ
+                            </button>
+                            <span className="or-divider">หรือ</span>
+                            <button
+                                className="btn-camera-trigger"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    openCamera(type, isMulti);
+                                }}
+                            >
+                                开 ถ่ายรูป
+                            </button>
+                        </div>
                     </div>
                 )}
             </div>
@@ -204,7 +263,7 @@ function ImageUploader({
                         ? "Drop multiple face images"
                         : "Drop a face image here"
                     }
-                    icon={isMultiMode ? "👥" : "👤"}
+                    icon={isMultiMode ? "" : ""}
                     isMulti={isMultiMode}
                 />
 
@@ -219,10 +278,18 @@ function ImageUploader({
                     inputRef={targetInputRef}
                     title="Target Image"
                     description="Drop target image here"
-                    icon="🎯"
+                    icon=""
                     isMulti={false}
                 />
             </div>
+
+            {/* Camera Modal */}
+            {showCamera.active && (
+                <CameraCapture
+                    onCapture={handleCameraCapture}
+                    onCancel={closeCamera}
+                />
+            )}
         </div>
     );
 }

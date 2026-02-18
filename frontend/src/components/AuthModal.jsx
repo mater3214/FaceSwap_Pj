@@ -49,7 +49,7 @@ function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
 
                 {/* Header */}
                 <div className="modal-header">
-                    <div className="modal-logo">🎭</div>
+                    <div className="modal-logo">F</div>
                     <h2 className="modal-title">
                         {mode === 'login' ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก'}
                     </h2>
@@ -63,7 +63,7 @@ function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
                 {/* Not Configured Warning */}
                 {!isConfigured && (
                     <div className="config-warning">
-                        <span className="warning-icon">⚠️</span>
+                        <span className="warning-icon">!</span>
                         <div>
                             <strong>Supabase ยังไม่ได้ตั้งค่า</strong>
                             <p>กรุณาเพิ่ม VITE_SUPABASE_URL และ VITE_SUPABASE_ANON_KEY ใน .env</p>
@@ -120,14 +120,14 @@ function AuthModal({ isOpen, onClose, initialMode = 'login' }) {
                     {/* Error Message */}
                     {error && (
                         <div className="form-error">
-                            <span>❌</span> {error}
+                            <span>X</span> {error}
                         </div>
                     )}
 
                     {/* Success Message */}
                     {success && (
                         <div className="form-success">
-                            <span>✅</span> {success}
+                            <span>OK</span> {success}
                         </div>
                     )}
 
