@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { runBackgroundRemoval, getResultImageUrl, saveEditedResult } from '../services/api';
+import { runBackgroundRemoval, getResultImageUrl, saveEditedResult, fetchApi } from '../services/api';
 import ResultPicker from '../components/ResultPicker';
 import AuthImage from '../components/AuthImage';
 import './BackgroundRemovalTool.css';

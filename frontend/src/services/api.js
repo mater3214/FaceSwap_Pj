@@ -133,8 +133,9 @@ export async function runBackgroundRemoval(image, mode, colors = [], bgImage = n
  * @param {File} dstFile - Target image file
  */
 export async function detectTargetFaces(dstFile) {
+  const compressedDst = await compressImage(dstFile);
   const formData = new FormData();
-  formData.append('dst', dstFile);
+  formData.append('dst', compressedDst);
 
   const response = await fetchApi(`${API_BASE_URL}/api/simswap_multi_detect`, {
     method: 'POST',
@@ -156,9 +157,14 @@ export async function detectTargetFaces(dstFile) {
  * @param {Object} mapping - Face mapping { targetIdx: sourceIdx }
  */
 export async function runSimSwapMultiWithMapping(srcFiles, dstFile, mapping = null) {
+  const [compressedSrcFiles, compressedDst] = await Promise.all([
+    compressImages(srcFiles),
+    compressImage(dstFile)
+  ]);
+
   const formData = new FormData();
-  srcFiles.forEach(file => formData.append('src', file));
-  formData.append('dst', dstFile);
+  compressedSrcFiles.forEach(file => formData.append('src', file));
+  formData.append('dst', compressedDst);
 
   if (mapping && Object.keys(mapping).length > 0) {
     const mapStr = Object.entries(mapping)

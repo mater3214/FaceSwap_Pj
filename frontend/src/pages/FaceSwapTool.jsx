@@ -151,10 +151,8 @@ function FaceSwapTool() {
                 }
                 resultImageUrl = getResultImageUrl(result.result_url);
             } catch (apiError) {
-                console.warn('Backend not available, using mock mode:', apiError.message);
-                setStatus('โหมดทดสอบ (Backend ไม่พร้อม)...');
-                await new Promise(r => setTimeout(r, 800));
-                resultImageUrl = URL.createObjectURL(targetFile);
+                console.error('FaceSwap API Error:', apiError);
+                throw apiError;
             }
 
             setProgress(90);
