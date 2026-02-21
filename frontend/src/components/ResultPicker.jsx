@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { getRecentResults, deleteResult } from '../services/api';
+import { getRecentResults, deleteResult, fetchApi } from '../services/api';
+import AuthImage from './AuthImage';
 import './ResultPicker.css';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
@@ -39,24 +40,13 @@ function ResultPicker({ isOpen, onClose, onSelect, multiSelect = false, onMultiS
         }
     };
 
-    // Convert a single result item to a File via canvas (avoids CORS)
+    // Convert a single result item to a File via fetchApi (avoids CORS and bypasses Ngrok warning)
     const itemToFile = async (item) => {
-        const img = new Image();
-        img.crossOrigin = 'anonymous';
         const imageUrl = `${API_BASE}${item.url}`;
-        return new Promise((resolve, reject) => {
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                canvas.width = img.naturalWidth;
-                canvas.height = img.naturalHeight;
-                canvas.getContext('2d').drawImage(img, 0, 0);
-                canvas.toBlob((blob) => {
-                    blob ? resolve(new File([blob], item.filename, { type: 'image/png' })) : reject(new Error('toBlob failed'));
-                }, 'image/png');
-            };
-            img.onerror = () => reject(new Error('Image load failed'));
-            img.src = imageUrl + '?t=' + Date.now();
-        });
+        const response = await fetchApi(imageUrl);
+        if (!response.ok) throw new Error('Failed to fetch image file');
+        const blob = await response.blob();
+        return new File([blob], item.filename, { type: blob.type || 'image/png' });
     };
 
     // Single select handler
@@ -162,11 +152,7 @@ function ResultPicker({ isOpen, onClose, onSelect, multiSelect = false, onMultiS
                                         </div>
                                     )}
                                     <div className="result-card-img-wrapper">
-                                        <img
-                                            src={`${API_BASE}${item.url}`}
-                                            alt={item.filename}
-                                            loading="lazy"
-                                        />
+                                        <AuthImage url={`${API_BASE}${item.url}`} alt={item.filename} />
                                         {(converting === item.filename || converting === 'multi') && selected.has(item.filename) && (
                                             <div className="result-card-loading-overlay">
                                                 <div className="spinner"></div>

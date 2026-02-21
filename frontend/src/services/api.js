@@ -3,14 +3,17 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000
 
 import { compressImage, compressImages } from '../utils/imageUtils';
 
+// Helper to bypass Ngrok free tier warning on all API calls
+export async function fetchApi(url, options = {}) {
+  const headers = new Headers(options.headers || {});
+  headers.set('ngrok-skip-browser-warning', 'true');
+  return fetch(url, { ...options, headers });
+}
+
 /**
  * Run SimSwap face swap (single face)
- * @param {File} srcFile - Source face image
- * @param {File} dstFile - Target/destination image
- * @param {string} regionId - Selected region ID (optional, for future use)
  */
 export async function runSimSwap(srcFile, dstFile, regionId = null) {
-  // Compress images before upload
   const [compressedSrc, compressedDst] = await Promise.all([
     compressImage(srcFile),
     compressImage(dstFile)
@@ -20,7 +23,7 @@ export async function runSimSwap(srcFile, dstFile, regionId = null) {
   formData.append('src', compressedSrc);
   formData.append('dst', compressedDst);
 
-  const response = await fetch(`${API_BASE_URL}/api/simswap`, {
+  const response = await fetchApi(`${API_BASE_URL}/api/simswap`, {
     method: 'POST',
     body: formData,
   });
@@ -35,11 +38,8 @@ export async function runSimSwap(srcFile, dstFile, regionId = null) {
 
 /**
  * Run SimSwap face swap (multiple faces)
- * @param {File[]} srcFiles - Array of source face images
- * @param {File} dstFile - Target/destination image
  */
 export async function runSimSwapMulti(srcFiles, dstFile) {
-  // Compress images before upload
   const [compressedSrcFiles, compressedDst] = await Promise.all([
     compressImages(srcFiles),
     compressImage(dstFile)
@@ -51,7 +51,7 @@ export async function runSimSwapMulti(srcFiles, dstFile) {
   });
   formData.append('dst', compressedDst);
 
-  const response = await fetch(`${API_BASE_URL}/api/simswap_multi_upload`, {
+  const response = await fetchApi(`${API_BASE_URL}/api/simswap_multi_upload`, {
     method: 'POST',
     body: formData,
   });
@@ -69,7 +69,7 @@ export async function runSimSwapMulti(srcFiles, dstFile) {
  */
 export async function checkHealth() {
   try {
-    const response = await fetch(`${API_BASE_URL}/health`);
+    const response = await fetchApi(`${API_BASE_URL}/health`);
     if (!response.ok) return false;
     const data = await response.json();
     return data.status === 'ok';
@@ -77,6 +77,7 @@ export async function checkHealth() {
     return false;
   }
 }
+
 
 /**
  * Get full URL for result image
@@ -110,7 +111,7 @@ export async function runBackgroundRemoval(image, mode, colors = [], bgImage = n
     formData.append('bg_image', bgImage);
   }
 
-  const response = await fetch(`${API_BASE_URL}/api/background_removal`, {
+  const response = await fetchApi(`${API_BASE_URL}/api/background_removal`, {
     method: 'POST',
     body: formData,
   });
@@ -135,7 +136,7 @@ export async function detectTargetFaces(dstFile) {
   const formData = new FormData();
   formData.append('dst', dstFile);
 
-  const response = await fetch(`${API_BASE_URL}/api/simswap_multi_detect`, {
+  const response = await fetchApi(`${API_BASE_URL}/api/simswap_multi_detect`, {
     method: 'POST',
     body: formData,
   });
@@ -167,7 +168,7 @@ export async function runSimSwapMultiWithMapping(srcFiles, dstFile, mapping = nu
     if (mapStr) formData.append('mapping', mapStr);
   }
 
-  const response = await fetch(`${API_BASE_URL}/api/simswap_multi_upload`, {
+  const response = await fetchApi(`${API_BASE_URL}/api/simswap_multi_upload`, {
     method: 'POST',
     body: formData,
   });
@@ -188,7 +189,7 @@ export async function runSimSwapMultiWithMapping(srcFiles, dstFile, mapping = nu
  * Get available HeadNeRF samples
  */
 export async function getHeadNeRFSamples() {
-  const response = await fetch(`${API_BASE_URL}/api/headnerf/samples`);
+  const response = await fetchApi(`${API_BASE_URL}/api/headnerf/samples`);
   if (!response.ok) {
     throw new Error('Failed to fetch HeadNeRF samples');
   }
@@ -199,7 +200,7 @@ export async function getHeadNeRFSamples() {
  * Get current HeadNeRF state
  */
 export async function getHeadNeRFCurrent() {
-  const response = await fetch(`${API_BASE_URL}/api/headnerf/current`);
+  const response = await fetchApi(`${API_BASE_URL}/api/headnerf/current`);
   if (!response.ok) {
     throw new Error('Failed to get current state');
   }
@@ -211,7 +212,7 @@ export async function getHeadNeRFCurrent() {
  * @param {string} sampleName - Name of sample to use as source
  */
 export async function setHeadNeRFSource(sampleName) {
-  const response = await fetch(
+  const response = await fetchApi(
     `${API_BASE_URL}/api/headnerf/set_source?sample_name=${encodeURIComponent(sampleName)}`,
     { method: 'POST' }
   );
@@ -226,7 +227,7 @@ export async function setHeadNeRFSource(sampleName) {
  * @param {string} sampleName - Name of sample to use as target
  */
 export async function setHeadNeRFTarget(sampleName) {
-  const response = await fetch(
+  const response = await fetchApi(
     `${API_BASE_URL}/api/headnerf/set_target?sample_name=${encodeURIComponent(sampleName)}`,
     { method: 'POST' }
   );
@@ -242,7 +243,7 @@ export async function setHeadNeRFTarget(sampleName) {
  */
 export async function renderHeadNeRF(params) {
   const queryParams = new URLSearchParams(params);
-  const response = await fetch(`${API_BASE_URL}/api/headnerf/render?${queryParams}`);
+  const response = await fetchApi(`${API_BASE_URL}/api/headnerf/render?${queryParams}`);
 
   if (!response.ok) {
     throw new Error('HeadNeRF render failed');
@@ -258,7 +259,7 @@ export async function fitHeadNeRF(imageFile) {
   const formData = new FormData();
   formData.append('image', imageFile);
 
-  const response = await fetch(`${API_BASE_URL}/api/headnerf/fit`, {
+  const response = await fetchApi(`${API_BASE_URL}/api/headnerf/fit`, {
     method: 'POST',
     body: formData,
   });
@@ -280,7 +281,7 @@ export async function fitHeadNeRF(imageFile) {
  * @returns {{ results: Array<{ filename, tool, toolLabel, url, timestamp, size }> }}
  */
 export async function getRecentResults() {
-  const response = await fetch(`${API_BASE_URL}/api/results`);
+  const response = await fetchApi(`${API_BASE_URL}/api/results`);
   if (!response.ok) {
     throw new Error('Failed to fetch results');
   }
@@ -293,7 +294,7 @@ export async function getRecentResults() {
  * @param {string} filename - File name to delete
  */
 export async function deleteResult(tool, filename) {
-  const response = await fetch(`${API_BASE_URL}/api/results/${tool}/${filename}`, {
+  const response = await fetchApi(`${API_BASE_URL}/api/results/${tool}/${filename}`, {
     method: 'DELETE',
   });
   if (!response.ok) {
@@ -310,7 +311,7 @@ export async function deleteResult(tool, filename) {
  */
 export async function resultUrlToFile(url, filename = 'result.png') {
   const fullUrl = url.startsWith('http') ? url : `${API_BASE_URL}${url}`;
-  const response = await fetch(fullUrl);
+  const response = await fetchApi(fullUrl);
   const blob = await response.blob();
   return new File([blob], filename, { type: blob.type });
 }
@@ -326,7 +327,7 @@ export async function saveEditedResult(blob, tool = 'simswap') {
   formData.append('image', blob, 'edited.png');
   formData.append('tool', tool);
 
-  const response = await fetch(`${API_BASE_URL}/api/results/save`, {
+  const response = await fetchApi(`${API_BASE_URL}/api/results/save`, {
     method: 'POST',
     body: formData,
   });

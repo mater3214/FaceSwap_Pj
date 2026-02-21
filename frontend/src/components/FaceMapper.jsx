@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { detectTargetFaces, getResultImageUrl } from '../services/api';
+import { detectTargetFaces } from '../services/api';
+import AuthImage from './AuthImage';
 import './FaceMapper.css';
 
 function FaceMapper({
@@ -104,8 +105,8 @@ function FaceMapper({
                             <div className="faces-grid">
                                 {targetFaces.map((face) => (
                                     <div key={face.index} className="face-item target-face">
-                                        <img
-                                            src={getResultImageUrl(face.url)}
+                                        <AuthImage
+                                            url={face.url}
                                             alt={`Target ${face.index + 1}`}
                                         />
                                         <span className="face-label">T{face.index + 1}</span>

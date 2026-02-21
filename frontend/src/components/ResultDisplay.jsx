@@ -43,28 +43,50 @@ function ResultDisplay({
         return () => { urls.forEach(url => URL.revokeObjectURL(url)); };
     }, [sourceFiles]);
 
-    // Handle both API URLs and blob URLs
-    const resultImageUrl = resultUrl
-        ? (resultUrl.startsWith('blob:') ? resultUrl : getResultImageUrl(resultUrl))
-        : null;
+    const [fetchedResultUrl, setFetchedResultUrl] = useState(null);
 
-    const handleDownload = async () => {
-        if (!resultImageUrl) return;
-
-        try {
-            const response = await fetch(resultImageUrl);
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `facelab_result_${Date.now()}.png`;
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(a);
-        } catch (error) {
-            console.error('Download failed:', error);
+    // Fetch result image with Ngrok bypass header
+    useEffect(() => {
+        if (!resultUrl) {
+            setFetchedResultUrl(null);
+            return;
         }
+
+        if (resultUrl.startsWith('blob:')) {
+            setFetchedResultUrl(resultUrl);
+            return;
+        }
+
+        let isMounted = true;
+        const fetchImage = async () => {
+            try {
+                const fullUrl = getResultImageUrl(resultUrl);
+                const response = await fetch(fullUrl, {
+                    headers: { 'ngrok-skip-browser-warning': 'true' }
+                });
+                if (!response.ok) throw new Error('Failed to fetch result image');
+                const blob = await response.blob();
+                if (isMounted) {
+                    setFetchedResultUrl(URL.createObjectURL(blob));
+                }
+            } catch (error) {
+                console.error('Error fetching result image:', error);
+            }
+        };
+
+        fetchImage();
+        return () => { isMounted = false; };
+    }, [resultUrl]);
+
+    const handleDownload = () => {
+        if (!fetchedResultUrl) return;
+
+        const a = document.createElement('a');
+        a.href = fetchedResultUrl;
+        a.download = `facelab_result_${Date.now()}.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
     };
 
     return (
@@ -131,9 +153,9 @@ function ResultDisplay({
                         ผลลัพธ์
                     </div>
                     <div className="item-image result-image">
-                        {resultImageUrl && (
+                        {fetchedResultUrl && (
                             <img
-                                src={resultImageUrl.startsWith('blob:') ? resultImageUrl : `${resultImageUrl}?t=${Date.now()}`}
+                                src={fetchedResultUrl}
                                 alt="Result"
                             />
                         )}
