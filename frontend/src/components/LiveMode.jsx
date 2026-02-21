@@ -2,6 +2,9 @@ import React, { useState, useRef, useEffect } from 'react';
 import ResultPicker from './ResultPicker';
 import './LiveMode.css';
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+const WS_BASE = API_BASE.replace(/^http/, 'ws');
+
 const LiveMode = () => {
     const [sourceImage, setSourceImage] = useState(null);
     const [isLive, setIsLive] = useState(false);
@@ -36,7 +39,7 @@ const LiveMode = () => {
         formData.append('src', file);
 
         try {
-            const response = await fetch('http://localhost:8000/api/live/prepare_source', {
+            const response = await fetch(`${API_BASE}/api/live/prepare_source`, {
                 method: 'POST',
                 body: formData,
             });
@@ -73,7 +76,7 @@ const LiveMode = () => {
         formData.append('src', file);
 
         try {
-            const response = await fetch('http://localhost:8000/api/live/prepare_source', {
+            const response = await fetch(`${API_BASE}/api/live/prepare_source`, {
                 method: 'POST',
                 body: formData,
             });
@@ -107,7 +110,7 @@ const LiveMode = () => {
             }
 
             // Connect WebSocket
-            const ws = new WebSocket(`ws://localhost:8000/api/live/ws/swap?session_id=${sessionId}`);
+            const ws = new WebSocket(`${WS_BASE}/api/live/ws/swap?session_id=${sessionId}`);
             wsRef.current = ws;
 
             ws.onopen = () => {

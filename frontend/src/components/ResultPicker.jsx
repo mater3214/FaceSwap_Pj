@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { getRecentResults, deleteResult } from '../services/api';
 import './ResultPicker.css';
 
-const API_BASE = 'http://localhost:8000';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
 /**
  * ResultPicker — modal that shows recent results from all tools.
