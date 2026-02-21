@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { runBackgroundRemoval, getResultImageUrl, saveEditedResult } from '../services/api';
 import ResultPicker from '../components/ResultPicker';
+import AuthImage from '../components/AuthImage';
 import './BackgroundRemovalTool.css';
 
 const PRESET_COLORS = [
@@ -468,11 +469,29 @@ function BackgroundRemovalTool() {
         for (const layer of layers) {
             const img = new Image();
             img.crossOrigin = "anonymous";
-            img.src = layer.url;
-            await new Promise(r => img.onload = r);
-
             // Fit Scale: replicate 'object-fit: contain' logic relative to canvas size
-            const fitScale = Math.min(canvas.width / img.naturalWidth, canvas.height / img.naturalHeight);
+            let fitScale = 1;
+
+            try {
+                // We must fetch the image via AuthImage bypass logic because natural canvas CORS will hit Ngrok warning
+                const response = await fetchApi(layer.url);
+                if (!response.ok) throw new Error('CORS fetch failed');
+                const blob = await response.blob();
+                const objectUrl = URL.createObjectURL(blob);
+
+                img.src = objectUrl;
+                await new Promise(r => img.onload = r);
+                fitScale = Math.min(canvas.width / img.naturalWidth, canvas.height / img.naturalHeight);
+                URL.revokeObjectURL(objectUrl);
+            } catch (err) {
+                console.error("Canvas draw failed for layer", err);
+                // Fallback attempt
+                img.src = layer.url;
+                await new Promise(r => { img.onload = r; img.onerror = r; });
+                if (img.naturalWidth) {
+                    fitScale = Math.min(canvas.width / img.naturalWidth, canvas.height / img.naturalHeight);
+                }
+            }
 
             ctx.save();
             ctx.translate(cx, cy); // origin at center
@@ -694,7 +713,7 @@ function BackgroundRemovalTool() {
                                         /* --- IMAGE MODE RESULT --- */
                                         <div className="result-preview">
                                             <div className="checkered-bg">
-                                                <img src={compositePreview || results[0]} alt="Result" />
+                                                <AuthImage url={results[0]} alt="Result" />
                                             </div>
                                         </div>
                                     ) : (
@@ -705,7 +724,7 @@ function BackgroundRemovalTool() {
                                                     className="compare-slider"
                                                     style={{ '--position': `${comparePosition}%` }}
                                                 >
-                                                    <img src={results[0]} alt="Result" className="compare-img result" />
+                                                    <AuthImage url={results[0]} alt="Result" className="compare-img result" />
                                                     <img src={originalPreview} alt="Original" className="compare-img original" />
                                                     <input
                                                         type="range"
@@ -727,7 +746,7 @@ function BackgroundRemovalTool() {
                                         ) : (
                                             <div className="result-preview">
                                                 <div className="checkered-bg">
-                                                    <img src={results[0]} alt="Result" />
+                                                    <AuthImage url={results[0]} alt="Result" />
                                                 </div>
                                             </div>
                                         )
@@ -953,7 +972,7 @@ function BackgroundRemovalTool() {
                                                                     setActiveLayerId(layer.id);
                                                                 }}
                                                             >
-                                                                <img src={layer.url} className="layer-thumb" alt={`Person ${index + 1}`} />
+                                                                <AuthImage url={layer.url} className="layer-thumb" alt={`Person ${index + 1}`} />
                                                                 {activeLayerId === layer.id && <span className="layer-badge">✓</span>}
                                                             </div>
                                                         ))}
@@ -1000,28 +1019,36 @@ function BackgroundRemovalTool() {
 
                                         {/* Render All Layers */}
                                         {layers.map(layer => (
-                                            <img
-                                                key={layer.id}
-                                                src={layer.url}
-                                                className={`comp-fg-layer ${activeLayerId === layer.id ? 'active-layer' : ''}`}
-                                                alt={`Person ${layer.id}`}
+                                            <div
+                                                key={`wrapper-${layer.id}`}
                                                 style={{
                                                     position: 'absolute',
                                                     top: 0,
                                                     left: 0,
                                                     width: '100%',
                                                     height: '100%',
-                                                    objectFit: 'contain',
                                                     transform: `translate(${layer.x}px, ${layer.y}px) scale(${layer.scale})`,
                                                     cursor: adjustmentMode !== 'auto' ? 'grab' : 'default',
                                                     transformOrigin: 'center center',
                                                     zIndex: layer.zIndex,
-                                                    border: (adjustmentMode === 'multi' && activeLayerId === layer.id) ? '2px dashed #3b82f6' : 'none',
-                                                    pointerEvents: 'auto' // Enable events on image for selection
+                                                    pointerEvents: 'auto'
                                                 }}
                                                 onMouseDown={(e) => handleMouseDown(e, layer.id)}
-                                                draggable="false"
-                                            />
+                                            >
+                                                <AuthImage
+                                                    key={layer.id}
+                                                    url={layer.url}
+                                                    className={`comp-fg-layer ${activeLayerId === layer.id ? 'active-layer' : ''}`}
+                                                    alt={`Person ${layer.id}`}
+                                                    style={{
+                                                        width: '100%',
+                                                        height: '100%',
+                                                        objectFit: 'contain',
+                                                        border: (adjustmentMode === 'multi' && activeLayerId === layer.id) ? '2px dashed #3b82f6' : 'none',
+                                                        pointerEvents: 'none' // Let the wrapper handle events
+                                                    }}
+                                                />
+                                            </div>
                                         ))}
 
 
