@@ -52,21 +52,65 @@
 }
 
 .contact-card h2 {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
+    font-size: 1.8rem;
+    margin-bottom: 2rem;
 }
 
-.contact-email {
-    display: block;
-    font-size: 1.5rem;
-    color: #9ca3af;
-    margin-bottom: 1rem;
-    text-decoration: none;
-    transition: color 0.2s;
+.contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    text-align: left;
 }
 
-.contact-email:hover {
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    font-size: 0.95rem;
+    color: #cbd5e1;
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: var(--radius-md);
     color: white;
+    font-family: inherit;
+    font-size: 1rem;
+    transition: all 0.2s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: #64748b;
+}
+
+.btn-submit {
+    margin-top: 1rem;
+    width: 100%;
+    padding: 1rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.contact-hint {
+    color: #6b7280;
+    font-size: 0.9rem;
 }
 
 .contact-hint {
