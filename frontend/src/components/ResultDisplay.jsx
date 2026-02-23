@@ -165,7 +165,7 @@ function ResultDisplay({
 
             <div className="result-actions">
                 <button className="btn btn-secondary" onClick={onReset}>
-                    <span></span> Reset
+                    <span></span> Previous
                 </button>
                 <button className="btn btn-primary" onClick={onProceedToEdit}>
                     <span></span> Color Edit
