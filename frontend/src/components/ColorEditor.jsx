@@ -191,50 +191,9 @@ function ColorEditor({
             <div className="editor-layout">
                 {/* Preview */}
                 <div className="preview-panel">
-                    <div className="preview-container">
-                        {imageLoaded ? (
-                            <canvas ref={canvasRef} className="preview-canvas" />
-                        ) : (
-                            <div className="loading-preview">
-                                <div className="spinner"></div>
-                                <span>กำลังโหลดรูปภาพ...</span>
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-                {/* Controls */}
-                <div className="controls-panel">
-                    <div className="controls-section">
-                        <h3 className="section-title">การปรับแต่ง</h3>
-
-                        {sliders.map((slider) => (
-                            <div key={slider.name} className="slider-group">
-                                <div className="slider-header">
-                                    <span className="slider-icon">{slider.icon}</span>
-                                    <span className="slider-label">{slider.label}</span>
-                                    <span className="slider-value">{Math.round(adjustments[slider.name])}</span>
-                                </div>
-                                <input
-                                    type="range"
-                                    min={slider.min}
-                                    max={slider.max}
-                                    value={adjustments[slider.name]}
-                                    onChange={(e) => handleSliderChange(slider.name, e.target.value)}
-                                    className="slider"
-                                />
-                            </div>
-                        ))}
-
-                        <button className="btn btn-ghost reset-btn" onClick={handleReset}>
-                            Reset
-                        </button>
-                    </div>
-
-                    {/* Presets */}
-                    <div className="controls-section">
-                        <h3 className="section-title">พรีเซ็ตตามภูมิภาค</h3>
-                        <div className="preset-grid">
+                    {/* Presets moved to top row */}
+                    <div className="preset-top-bar">
+                        <div className="preset-grid horizontal">
                             <button
                                 className="preset-btn warm"
                                 onClick={() => setAdjustments(prev => ({
@@ -277,23 +236,64 @@ function ColorEditor({
                             </button>
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <div className="editor-actions">
-                <button className="btn btn-secondary" onClick={onBack}>
-                    ← กลับ
-                </button>
-                <button
-                    className={`btn ${saved ? 'btn-success' : 'btn-secondary'}`}
-                    onClick={handleSaveForReuse}
-                    disabled={saving || !imageLoaded}
-                >
-                    {saving ? 'Saving...' : saved ? 'Saved!' : 'Save for Reuse'}
-                </button>
-                <button className="btn btn-primary" onClick={handleDownload}>
-                    Download Result
-                </button>
+                    <div className="preview-container">
+                        {imageLoaded ? (
+                            <canvas ref={canvasRef} className="preview-canvas" />
+                        ) : (
+                            <div className="loading-preview">
+                                <div className="spinner"></div>
+                                <span>กำลังโหลดรูปภาพ...</span>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Actions moved to under the picture */}
+                    <div className="editor-actions">
+                        <button className="btn btn-secondary" onClick={onBack}>
+                            ← กลับ
+                        </button>
+                        <button
+                            className={`btn ${saved ? 'btn-success' : 'btn-secondary'}`}
+                            onClick={handleSaveForReuse}
+                            disabled={saving || !imageLoaded}
+                        >
+                            {saving ? 'Saving...' : saved ? 'Saved!' : 'Save for Reuse'}
+                        </button>
+                        <button className="btn btn-primary" onClick={handleDownload}>
+                            Download Result
+                        </button>
+                    </div>
+                </div>
+
+                {/* Controls */}
+                <div className="controls-panel">
+                    <div className="controls-section">
+                        <h3 className="section-title">การปรับแต่ง</h3>
+
+                        {sliders.map((slider) => (
+                            <div key={slider.name} className="slider-group">
+                                <div className="slider-header">
+                                    <span className="slider-icon">{slider.icon}</span>
+                                    <span className="slider-label">{slider.label}</span>
+                                    <span className="slider-value">{Math.round(adjustments[slider.name])}</span>
+                                </div>
+                                <input
+                                    type="range"
+                                    min={slider.min}
+                                    max={slider.max}
+                                    value={adjustments[slider.name]}
+                                    onChange={(e) => handleSliderChange(slider.name, e.target.value)}
+                                    className="slider"
+                                />
+                            </div>
+                        ))}
+
+                        <button className="btn btn-ghost reset-btn" onClick={handleReset}>
+                            Reset
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     );

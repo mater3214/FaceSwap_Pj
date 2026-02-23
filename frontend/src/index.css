@@ -203,7 +203,7 @@ select:focus {
   justify-content: center;
   gap: var(--spacing-xs);
   padding: var(--spacing-sm) var(--spacing-lg);
-  border-radius: var(--radius-full);
+  border-radius: 50px !important;
   /* Pill shape for buttons */
   font-weight: 500;
   font-size: var(--font-sm);
