@@ -27,7 +27,7 @@ function ContactPage() {
                 },
                 body: JSON.stringify({
                     // TODO: ให้แอดมินนำ Access Key จาก web3forms.com มาใส่ที่นี่ (ฟรี ดึงเข้าเมล materking7661@gmail.com)
-                    access_key: "YOUR_WEB3FORMS_ACCESS_KEY",
+                    access_key: "7d17b7c8-927c-4997-ac9b-5d4f61e312dd",
                     email: formData.email,     // อีเมลของผู้ส่ง (ผู้ใช้)
                     subject: formData.subject, // หัวข้อ
                     message: formData.message, // ข้อความ
