@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { getResultImageUrl, saveEditedResult } from '../services/api';
+import { getResultImageUrl, saveEditedResult, fetchApi } from '../services/api';
 import './ColorEditor.css';
 
 function ColorEditor({
@@ -27,10 +27,14 @@ function ColorEditor({
 
     // Load image and apply initial region preset
     useEffect(() => {
-        if (resultUrl) {
+        let isMounted = true;
+        const loadImg = async () => {
+            if (!resultUrl) return;
+
             const img = new Image();
             img.crossOrigin = 'anonymous';
             img.onload = () => {
+                if (!isMounted) return;
                 originalImageRef.current = img;
                 setImageLoaded(true);
 
@@ -46,12 +50,24 @@ function ColorEditor({
                     }));
                 }
             };
-            // Handle both API URLs and blob URLs
-            const imageUrl = resultUrl.startsWith('blob:')
-                ? resultUrl
-                : getResultImageUrl(resultUrl) + '?t=' + Date.now();
-            img.src = imageUrl;
-        }
+
+            let finalUrl = resultUrl;
+            if (!resultUrl.startsWith('blob:') && !resultUrl.startsWith('data:')) {
+                try {
+                    const fullUrl = getResultImageUrl(resultUrl);
+                    const response = await fetchApi(fullUrl);
+                    if (!response.ok) throw new Error('Fetch failed');
+                    const blob = await response.blob();
+                    finalUrl = URL.createObjectURL(blob);
+                } catch (e) {
+                    console.error("ColorEditor load failed", e);
+                }
+            }
+            img.src = finalUrl;
+        };
+
+        loadImg();
+        return () => { isMounted = false; };
     }, [resultUrl, selectedRegion]);
 
     // Apply filters when adjustments change

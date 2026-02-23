@@ -126,13 +126,14 @@
 .result-actions {
     display: flex;
     justify-content: center;
-    gap: var(--spacing-md);
+    gap: var(--spacing-lg);
     margin-top: var(--spacing-xl);
     flex-wrap: wrap;
 }
 
 .result-actions .btn {
     min-width: 140px;
+    padding: 12px 24px;
 }
 
 /* Responsive */
