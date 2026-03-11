@@ -242,7 +242,16 @@
     padding: 12px 20px;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.footer-left,
+.footer-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .result-picker-refresh {
@@ -259,6 +268,91 @@
 .result-picker-refresh:hover {
     background: rgba(255, 255, 255, 0.12);
     color: #fff;
+}
+
+/* Delete mode toggle */
+.rp-btn-delete-mode {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7);
+    padding: 6px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+}
+
+.rp-btn-delete-mode:hover {
+    background: rgba(255, 60, 60, 0.15);
+    border-color: rgba(255, 60, 60, 0.3);
+    color: #ff6b6b;
+}
+
+.rp-btn-delete-mode.active {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: #fff;
+}
+
+/* Delete all */
+.rp-btn-delete-all {
+    background: rgba(255, 60, 60, 0.15);
+    border: 1px solid rgba(255, 60, 60, 0.3);
+    color: #ff6b6b;
+    padding: 6px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.rp-btn-delete-all:hover:not(:disabled) {
+    background: rgba(255, 60, 60, 0.3);
+    color: #fff;
+}
+
+.rp-btn-delete-all:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Delete selected */
+.rp-btn-delete-selected {
+    background: #ef4444;
+    border: none;
+    color: #fff;
+    padding: 8px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.rp-btn-delete-selected:hover:not(:disabled) {
+    background: #dc2626;
+}
+
+.rp-btn-delete-selected:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Marked for delete card */
+.result-picker-card.marked-delete {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.35);
+}
+
+.result-card-checkbox.delete-check {
+    border-color: rgba(239, 68, 68, 0.6);
+    background: rgba(239, 68, 68, 0.3);
+}
+
+.result-picker-card.marked-delete .result-card-checkbox.delete-check {
+    background: #ef4444;
+    border-color: #ef4444;
 }
 
 /* Light theme overrides */
@@ -309,7 +403,8 @@
     border-color: rgba(0, 0, 0, 0.08);
 }
 
-[data-theme="light"] .result-picker-refresh {
+[data-theme="light"] .result-picker-refresh,
+[data-theme="light"] .rp-btn-delete-mode {
     background: rgba(0, 0, 0, 0.04);
     border-color: rgba(0, 0, 0, 0.1);
     color: rgba(0, 0, 0, 0.6);
@@ -320,6 +415,12 @@
     color: #333;
 }
 
+[data-theme="light"] .rp-btn-delete-mode:hover {
+    background: rgba(255, 60, 60, 0.08);
+    border-color: rgba(255, 60, 60, 0.2);
+    color: #dc2626;
+}
+
 /* Multi-select checkbox */
 .result-card-checkbox {
     position: absolute;
@@ -328,8 +429,8 @@
     width: 22px;
     height: 22px;
     border-radius: 4px;
-    border: 2px solid rgba(255,255,255,0.45);
-    background: rgba(0,0,0,0.35);
+    border: 2px solid rgba(255, 255, 255, 0.45);
+    background: rgba(0, 0, 0, 0.35);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -353,14 +454,14 @@
 /* Multi-select confirm bar */
 .result-picker-multi-bar {
     padding: 12px 20px;
-    border-top: 1px solid rgba(255,255,255,0.08);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
     display: flex;
     align-items: center;
     justify-content: space-between;
 }
 
 .result-picker-multi-bar span {
-    color: rgba(255,255,255,0.6);
+    color: rgba(255, 255, 255, 0.6);
     font-size: 0.85rem;
 }
 

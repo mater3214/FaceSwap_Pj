@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import './ResultDisplay.css';
 import { getResultImageUrl } from '../services/api';
 
@@ -11,13 +11,12 @@ function ResultDisplay({
     onProceedToEdit,
     isMultiMode = false
 }) {
-    // Handle single or multi source files
     const hasMultipleSources = isMultiMode && sourceFiles.length > 0;
 
-    // Manage ObjectURLs with proper cleanup
     const [sourcePreview, setSourcePreview] = useState(null);
     const [targetPreview, setTargetPreview] = useState(null);
     const [multiPreviews, setMultiPreviews] = useState([]);
+    const [fetchedResultUrl, setFetchedResultUrl] = useState(null);
 
     // Cleanup and create source preview
     useEffect(() => {
@@ -38,12 +37,10 @@ function ResultDisplay({
     // Cleanup and create multi source previews
     useEffect(() => {
         multiPreviews.forEach(url => URL.revokeObjectURL(url));
-        const urls = sourceFiles.slice(0, 4).map(f => URL.createObjectURL(f));
+        const urls = (sourceFiles || []).slice(0, 4).map(f => URL.createObjectURL(f));
         setMultiPreviews(urls);
         return () => { urls.forEach(url => URL.revokeObjectURL(url)); };
     }, [sourceFiles]);
-
-    const [fetchedResultUrl, setFetchedResultUrl] = useState(null);
 
     // Fetch result image with Ngrok bypass header
     useEffect(() => {
@@ -80,13 +77,17 @@ function ResultDisplay({
 
     const handleDownload = () => {
         if (!fetchedResultUrl) return;
-
-        const a = document.createElement('a');
-        a.href = fetchedResultUrl;
-        a.download = `facelab_result_${Date.now()}.png`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+        try {
+            const a = document.createElement('a');
+            a.href = fetchedResultUrl;
+            a.download = `facelab_result_${Date.now()}.png`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        } catch (err) {
+            console.error('Download failed:', err);
+            alert('ดาวน์โหลดไม่สำเร็จ');
+        }
     };
 
     return (
@@ -99,28 +100,32 @@ function ResultDisplay({
                 <h2 className="result-title">ผลลัพธ์การสลับหน้า</h2>
             </div>
 
-            <div className="comparison-view">
-                {/* Source */}
-                <div className="comparison-item">
-                    <div className="item-label">
-                        <span className="label-icon">{hasMultipleSources ? 'S' : 'S'}</span>
-                        {hasMultipleSources ? 'รูปอ้างอิง (Sources)' : 'รูปอ้างอิง (Source)'}
-                    </div>
-                    <div className={`item-image ${hasMultipleSources ? 'multi-source' : ''}`}>
+            {/* Hero result image — shown prominently */}
+            <div className="result-hero">
+                <div className="result-hero-image">
+                    {fetchedResultUrl ? (
+                        <img src={fetchedResultUrl} alt="Result" />
+                    ) : (
+                        <div className="result-loading">
+                            <div className="spinner"></div>
+                            <span>กำลังโหลดผลลัพธ์...</span>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* Source + Target thumbnails */}
+            <div className="source-target-row">
+                <div className="thumb-item">
+                    <span className="thumb-label">S รูปอ้างอิง</span>
+                    <div className="thumb-image">
                         {hasMultipleSources ? (
-                            <div className="multi-source-grid">
+                            <div className="thumb-multi-grid">
                                 {multiPreviews.map((previewUrl, index) => (
-                                    <img
-                                        key={index}
-                                        src={previewUrl}
-                                        alt={`Source ${index + 1}`}
-                                        className="multi-source-img"
-                                    />
+                                    <img key={index} src={previewUrl} alt={`Source ${index + 1}`} />
                                 ))}
                                 {sourceFiles.length > 4 && (
-                                    <div className="more-indicator">
-                                        +{sourceFiles.length - 4}
-                                    </div>
+                                    <div className="thumb-more">+{sourceFiles.length - 4}</div>
                                 )}
                             </div>
                         ) : (
@@ -129,49 +134,25 @@ function ResultDisplay({
                     </div>
                 </div>
 
-                {/* Plus Sign */}
-                <div className="operator">+</div>
+                <div className="thumb-arrow">→</div>
 
-                {/* Target */}
-                <div className="comparison-item">
-                    <div className="item-label">
-                        <span className="label-icon">T</span>
-                        รูปเป้าหมาย (Target)
-                    </div>
-                    <div className="item-image">
+                <div className="thumb-item">
+                    <span className="thumb-label">T เป้าหมาย</span>
+                    <div className="thumb-image">
                         {targetPreview && <img src={targetPreview} alt="Target" />}
-                    </div>
-                </div>
-
-                {/* Equals Sign */}
-                <div className="operator">=</div>
-
-                {/* Result */}
-                <div className="comparison-item result">
-                    <div className="item-label">
-                        <span className="label-icon">R</span>
-                        ผลลัพธ์
-                    </div>
-                    <div className="item-image result-image">
-                        {fetchedResultUrl && (
-                            <img
-                                src={fetchedResultUrl}
-                                alt="Result"
-                            />
-                        )}
                     </div>
                 </div>
             </div>
 
             <div className="result-actions">
                 <button className="btn btn-secondary" onClick={onReset}>
-                    <span></span> Previous
+                    ← Previous
                 </button>
                 <button className="btn btn-primary" onClick={onProceedToEdit}>
-                    <span></span> Color Edit
+                    🎨 Color Edit
                 </button>
                 <button className="btn btn-secondary" onClick={handleDownload}>
-                    <span></span> Download
+                    ⬇ Download
                 </button>
             </div>
         </div>

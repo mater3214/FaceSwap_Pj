@@ -240,7 +240,7 @@ function ImageUploader({
                                     openCamera(type, isMulti);
                                 }}
                             >
-                                开 ถ่ายรูป
+                                ถ่ายรูป
                             </button>
                         </div>
                     </div>

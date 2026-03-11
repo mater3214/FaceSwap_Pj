@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import SimpleAutoSlider from '../components/SimpleAutoSlider';
 import AnimatedBackground from '../components/AnimatedBackground';
 import './AboutPage.css';
@@ -19,8 +20,8 @@ function AboutPage() {
                                 significant technological influence within the global community.
                             </p>
                             <div className="about-actions">
-                                <a href="/services" className="btn btn-primary">Our Services ↗</a>
-                                <a href="/contact" className="btn btn-primary">Contact Us ↗</a>
+                                <Link to="/services" className="btn btn-primary">Our Services ↗</Link>
+                                <Link to="/contact" className="btn btn-primary">Contact Us ↗</Link>
                             </div>
                         </div>
                         <div className="about-visual">
