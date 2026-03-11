@@ -263,7 +263,7 @@ function ImageUploader({
                         ? "Drop multiple face images"
                         : "Drop a face image here"
                     }
-                    icon={isMultiMode ? "" : ""}
+                    icon={isMultiMode ? "👥" : "👤"}
                     isMulti={isMultiMode}
                 />
 
@@ -278,7 +278,7 @@ function ImageUploader({
                     inputRef={targetInputRef}
                     title="Target Image"
                     description="Drop target image here"
-                    icon=""
+                    icon="🎯"
                     isMulti={false}
                 />
             </div>

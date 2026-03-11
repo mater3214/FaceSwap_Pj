@@ -23,10 +23,10 @@ const GRADIENT_PRESETS = [
 ];
 
 const MODES = [
-    { id: 'transparent', label: 'Transparent', icon: '', desc: 'PNG with no background' },
-    { id: 'color', label: 'Solid Color', icon: '', desc: 'Replace with solid color' },
-    { id: 'image', label: 'Custom Image', icon: '', desc: 'Use your own background' },
-    { id: 'blur', label: 'Blur Effect', icon: '', desc: 'Blur the original background' },
+    { id: 'transparent', label: 'Transparent', icon: '🔲', desc: 'PNG with no background' },
+    { id: 'color', label: 'Solid Color', icon: '🎨', desc: 'Replace with solid color' },
+    { id: 'image', label: 'Custom Image', icon: '🖼️', desc: 'Use your own background' },
+    { id: 'blur', label: 'Blur Effect', icon: '🌫️', desc: 'Blur the original background' },
 ];
 
 function BackgroundRemovalTool() {
@@ -604,7 +604,7 @@ function BackgroundRemovalTool() {
                                     </div>
                                 ) : (
                                     <div className="drop-content">
-                                        <div className="drop-icon">Upload</div>
+                                        <div className="drop-icon">📤 Upload</div>
                                         <h3>Drop your image here</h3>
                                         <p>or click to browse</p>
                                         <span className="supported-formats">PNG, JPG, WEBP up to 10MB</span>
@@ -661,7 +661,7 @@ function BackgroundRemovalTool() {
                                         </>
                                     ) : (
                                         <>
-                                            <span className="btn-icon">*</span>
+                                            <span className="btn-icon">✨</span>
                                             Remove Background
                                         </>
                                     )}
@@ -754,7 +754,7 @@ function BackgroundRemovalTool() {
                                 </div>
                             ) : (
                                 <div className="empty-result">
-                                    <div className="empty-icon">--</div>
+                                    <div className="empty-icon">📷</div>
                                     <p>Upload an image and click "Remove Background" to see the result here</p>
                                 </div>
                             )}
@@ -774,7 +774,7 @@ function BackgroundRemovalTool() {
                         {mode === 'blur' && (
                             <section className="options-section">
                                 <div className="info-card">
-                                    <span className="info-icon">i</span>
+                                    <span className="info-icon">ℹ️</span>
                                     <p>The original background will be blurred while keeping your subject sharp and in focus.</p>
                                 </div>
                             </section>

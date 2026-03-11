@@ -5,7 +5,7 @@ const TOOLS = [
     {
         id: 'background',
         name: 'Background Removal',
-        icon: '',
+        icon: '🖼️',
         enabled: true,
         description: 'Remove or replace background',
         path: '/tool/bg-removal'
@@ -13,7 +13,7 @@ const TOOLS = [
     {
         id: 'simswap-single',
         name: 'SimSwap (Single)',
-        icon: '',
+        icon: '🔄',
         enabled: true,
         description: 'Single face swap',
         path: '/tool/simswap'
@@ -21,7 +21,7 @@ const TOOLS = [
     {
         id: 'simswap-multi',
         name: 'SimSwap (Multi)',
-        icon: '',
+        icon: '👥',
         enabled: true,
         description: 'Multiple faces swap',
         path: '/tool/simswap-multi'
@@ -29,7 +29,7 @@ const TOOLS = [
     {
         id: 'headnerf',
         name: 'HeadNeRF',
-        icon: '',
+        icon: '🧊',
         enabled: true,
         description: 'Neural head generation',
         path: '/tool/headnerf'
@@ -40,7 +40,7 @@ const LIVE_TOOLS = [
     {
         id: 'live',
         name: 'Live Deepfake',
-        icon: '',
+        icon: '📹',
         enabled: true,
         description: 'Real-time face filtering',
         path: '/tool/live'
