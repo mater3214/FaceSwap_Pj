@@ -4,15 +4,60 @@
     min-height: 100vh;
 }
 
-/* Main Header */
+/* =====================
+   PREMIUM GLASSMORPHISM HEADER
+   ===================== */
 .main-header {
-    background: white;
-    border-bottom: 1px solid var(--border-primary);
     position: sticky;
     top: 0;
     z-index: 1000;
-    padding: 1rem 0;
-    box-shadow: var(--shadow-sm);
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 0.75rem 0;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.main-header.scrolled {
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.04),
+        0 8px 32px rgba(0, 0, 0, 0.06);
+    padding: 0.5rem 0;
+}
+
+/* Animated gradient border at bottom */
+.header-gradient-border {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg,
+            transparent,
+            #8b5cf6,
+            #06b6d4,
+            #ec4899,
+            #8b5cf6,
+            transparent);
+    background-size: 200% 100%;
+    animation: borderShimmer 4s linear infinite;
+    opacity: 0.7;
+}
+
+.main-header.scrolled .header-gradient-border {
+    opacity: 1;
+}
+
+@keyframes borderShimmer {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
 }
 
 .header-container {
@@ -21,50 +66,152 @@
     justify-content: space-between;
 }
 
-/* Logo - Bigger and Gradient */
+/* =====================
+   LOGO WITH GLOW
+   ===================== */
 .logo {
     display: flex;
     align-items: center;
+    gap: 10px;
+    text-decoration: none;
+}
+
+.logo-icon {
+    position: relative;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease;
+}
+
+.logo:hover .logo-icon {
+    transform: rotate(10deg) scale(1.1);
+}
+
+.logo-glow {
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.25), transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.logo:hover .logo-glow {
+    opacity: 1;
 }
 
 .logo-text {
-    font-size: 1.5rem;
-    font-weight: 700;
+    font-size: 1.45rem;
+    font-weight: 800;
     background: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.03em;
+    transition: all 0.3s ease;
 }
 
+.logo:hover .logo-text {
+    background: linear-gradient(135deg, #a78bfa 0%, #22d3ee 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+
+/* =====================
+   NAV LINKS WITH ANIMATED INDICATORS
+   ===================== */
 .main-nav {
     display: flex;
     align-items: center;
-    gap: 2rem;
+    gap: 0.25rem;
 }
 
 .nav-link {
+    position: relative;
     color: var(--text-secondary);
     font-weight: 500;
-    font-size: 0.95rem;
-    transition: color var(--transition-fast);
+    font-size: 0.92rem;
+    transition: color 0.3s ease;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.nav-indicator {
+    width: 0;
+    height: 2px;
+    border-radius: 1px;
+    background: linear-gradient(90deg, #8b5cf6, #06b6d4);
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .nav-link:hover {
-    color: var(--accent-primary);
+    color: var(--text-primary);
+    background: rgba(139, 92, 246, 0.06);
+}
+
+.nav-link:hover .nav-indicator {
+    width: 60%;
 }
 
 .nav-link.active {
-    color: var(--accent-primary);
+    color: #8b5cf6;
     font-weight: 600;
+    background: rgba(139, 92, 246, 0.08);
 }
 
-.header-actions .btn-sm {
-    padding: 0.5rem 1rem;
-    font-size: 0.85rem;
+.nav-link.active .nav-indicator {
+    width: 80%;
+    height: 2.5px;
+    background: linear-gradient(90deg, #8b5cf6, #ec4899);
 }
 
-/* Content Wrapper */
+/* =====================
+   GITHUB BUTTON
+   ===================== */
+.github-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0.5rem 1.1rem;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    background: rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.github-btn:hover {
+    background: var(--text-primary);
+    color: white;
+    border-color: var(--text-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.github-btn svg:last-child {
+    opacity: 0.5;
+    transition: all 0.3s ease;
+}
+
+.github-btn:hover svg:last-child {
+    opacity: 1;
+    transform: translate(2px, -2px);
+}
+
+/* =====================
+   CONTENT / SIDEBAR
+   ===================== */
 .main-body {
     flex: 1;
     display: flex;
@@ -93,7 +240,9 @@
     padding: 0;
 }
 
-/* Footer */
+/* =====================
+   FOOTER
+   ===================== */
 .main-footer {
     background: white;
     border-top: 1px solid var(--border-primary);
@@ -139,10 +288,12 @@
     font-size: 0.85rem;
 }
 
+/* =====================
+   RESPONSIVE
+   ===================== */
 @media (max-width: 768px) {
     .main-nav {
         display: none;
-        /* Mobile menu to be implemented if needed */
     }
 
     .footer-content {
