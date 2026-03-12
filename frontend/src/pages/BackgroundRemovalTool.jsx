@@ -595,7 +595,14 @@ function BackgroundRemovalTool() {
                                 onDrop={(e) => handleDrop(e, 'main')}
                                 onClick={() => document.getElementById('main-input').click()}
                             >
-                                {imagePreview ? (
+                                {(compositePreview && (mode === 'image' || mode === 'multi')) ? (
+                                    <div className="preview-container">
+                                        <img src={compositePreview} alt="Composite" className="main-preview" />
+                                        <div className="preview-overlay">
+                                            <span>Click or drop to replace</span>
+                                        </div>
+                                    </div>
+                                ) : imagePreview ? (
                                     <div className="preview-container">
                                         <img src={imagePreview} alt="Upload" className="main-preview" />
                                         <div className="preview-overlay">
@@ -713,7 +720,11 @@ function BackgroundRemovalTool() {
                                         /* --- IMAGE MODE RESULT --- */
                                         <div className="result-preview">
                                             <div className="checkered-bg">
-                                                <AuthImage url={results[0]} alt="Result" />
+                                                {compositePreview ? (
+                                                    <img src={compositePreview} alt="Composite Result" style={{ width: '100%', display: 'block' }} />
+                                                ) : (
+                                                    <AuthImage url={results[0]} alt="Result" />
+                                                )}
                                             </div>
                                         </div>
                                     ) : (
