@@ -8,15 +8,15 @@ function ResearchPage() {
     // ===========================================
     const myPapers = [
         {
-            title: "Your Paper Title Here",
-            authors: "Your Name, Co-Author 1, Co-Author 2",
-            venue: "Conference/Journal Name 2024",
-            year: "2024",
-            abstract: "Brief description of your paper. Explain what your research is about and what problems it solves.",
+            title: "Ai face lab ( Multi-Task Face AI System )",
+            authors: "Thossaphol Makpeam, Pasin Harnkam",
+            venue: "Senior Project",
+            year: "2026",
+            abstract: "โครงการโปรเจคนี้จัดทำขึ้นเพื่อการศึกษาและพัฒนาเท่านั้น.",
             tags: ["Deep Learning", "Face Recognition"],
-            arxiv: "https://arxiv.org/abs/xxxx.xxxxx",
+            arxiv: "https://drive.google.com/file/d/1bpKbAbeZe8VfJ0liA-jL__nyQWZ3gSvk/view?usp=sharing",
             pdf: null,
-            github: "https://github.com/your-repo",
+            github: "https://github.com/Thossaphol2204/facelab",
             demo: null,
             image: null
         },

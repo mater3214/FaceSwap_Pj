@@ -39,7 +39,6 @@
 }
 
 @keyframes pulse {
-
     0%,
     100% {
         opacity: 1;
@@ -399,6 +398,16 @@
 
 .paper-link.demo:hover {
     background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.1));
+    transform: translateY(-2px);
+}
+
+.paper-link.website {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(37, 99, 235, 0.05));
+    color: #3b82f6;
+}
+
+.paper-link.website:hover {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(37, 99, 235, 0.1));
     transform: translateY(-2px);
 }
 
