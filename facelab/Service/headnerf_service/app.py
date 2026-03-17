@@ -407,8 +407,14 @@ async def fit_image(image: UploadFile = File(...)):
                 f.write(f"{pt[1]}\n")
         
         # Step 3: Fit 3DMM
-        # Note: This requires pytorch3d which may not be installed
+        # Note: This requires pytorch3d which may not be installed.
+        # We use a local source copy with a pure-Python _C stub fallback.
         try:
+            # Inject local pytorch3d source (with _C.py stub) into sys.path
+            local_pytorch3d = str(HEADNERF_ROOT / "pytorch3d")
+            if local_pytorch3d not in sys.path:
+                sys.path.insert(0, local_pytorch3d)
+            
             sys.path.insert(0, str(HEADNERF_ROOT / "Fitting3DMM"))
             from Fitting3DMM.FittingNL3DMM import FittingNL3DMM
         except ModuleNotFoundError as e:
